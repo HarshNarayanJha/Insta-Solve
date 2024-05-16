@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:insta_solve/data/util_data.dart';
+import 'package:insta_solve/pages/answer_page.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
+
+  static const routeName = '/scan';
+  static const imagePathKey = 'image';
 
   @override
   State<ScanPage> createState() => _ScanPageState();
@@ -106,27 +110,27 @@ class _ScanPageState extends State<ScanPage> {
                     width: 300,
                     height: 300,
                     child: (_image == null)
-                              ? Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      _openGallery();
-                                    },
-                                    icon: const Icon(Icons.photo, size: 48,),
-                                    color: Colors.white,
-                                  ),
-          
-                                  IconButton(
-                                    onPressed: () {
-                                      _openCamera();
-                                    },
-                                    icon: const Icon(Icons.camera_alt, size: 48,),
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              )
-                              : Image.file(File(_image!.path)),
+                      ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              _openGallery();
+                            },
+                            icon: const Icon(Icons.photo, size: 48,),
+                            color: Colors.white,
+                          ),
+  
+                          IconButton(
+                            onPressed: () {
+                              _openCamera();
+                            },
+                            icon: const Icon(Icons.camera_alt, size: 48,),
+                            color: Colors.white,
+                          ),
+                        ],
+                      )
+                      : Image.file(File(_image!.path)),
                   ),
                   
                 ],
@@ -157,7 +161,7 @@ class _ScanPageState extends State<ScanPage> {
                 width: 300,
                 label: const Text("Question's Grade level"),
                 menuHeight: 500,
-                leadingIcon: Icon(Icons.class_outlined),
+                leadingIcon: const Icon(Icons.class_outlined),
                 initialSelection: gradeValue,
                 onSelected: (String? value) {
                   setState(() {
@@ -178,8 +182,8 @@ class _ScanPageState extends State<ScanPage> {
                   controller: customInput,
                   maxLength: 45,
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(16),
-                    label: Text("Custom Prompt"),
+                    contentPadding: const EdgeInsets.all(16),
+                    label: const Text("Custom Prompt"),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -191,11 +195,11 @@ class _ScanPageState extends State<ScanPage> {
           
               ElevatedButton.icon(
                 icon: Icon(Icons.home_work_outlined, color: Theme.of(context).colorScheme.onTertiaryContainer,),
-                onPressed: () {
-                  Navigator.pushNamed(context, "/answer");
+                onPressed: (_image == null) ? null : () {
+                  Navigator.pushNamed(context, AnswerPage.routeName, arguments: {ScanPage.imagePathKey: _image!.path} );
                 },
                 style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.tertiaryContainer)),
-                label: Text("Solve!", style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer),)
+                label: Text("Solve!", style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer))
               )
           
               // const Text("Scan question with your camera"),

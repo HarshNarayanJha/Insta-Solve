@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:insta_solve/pages/scan_page.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  static const routeName = '/home';
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +44,7 @@ class HomePage extends StatelessWidget {
         label: Text("Scan"),
         icon: Icon(Icons.camera_alt_rounded),
         onPressed: () {
-          Navigator.pushNamed(context, "/scan");
+          Navigator.pushNamed(context, ScanPage.routeName);
         }
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

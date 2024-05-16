@@ -27,9 +27,9 @@ class MyApp extends StatelessWidget {
       
       home: const HomePage(),
       routes: {
-        '/home': (context) => const HomePage(),
-        '/scan': (context) => const ScanPage(),
-        '/answer': (context) => const AnswerPage(),
+        HomePage.routeName: (context) => const HomePage(),
+        ScanPage.routeName: (context) => const ScanPage(),
+        AnswerPage.routeName: (context) => const AnswerPage(),
       },
     );
   }
