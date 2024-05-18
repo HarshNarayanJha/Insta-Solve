@@ -9,10 +9,14 @@ import 'package:insta_solve/pages/answer_page.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 
 class ScanPage extends StatefulWidget {
+
+
   const ScanPage({super.key});
 
   static const routeName = '/scan';
-  static const imagePathKey = 'image';
+  static const imageKey = 'image';
+  static const promptKey = 'prompt';
+  static const gradeKey = 'grade';
 
   @override
   State<ScanPage> createState() => _ScanPageState();
@@ -20,6 +24,9 @@ class ScanPage extends StatefulWidget {
 
 class _ScanPageState extends State<ScanPage> {
   XFile? _image;
+  String subjectValue = UtilData.qtypes.keys.first;
+  String gradeValue = UtilData.grades[9];
+  TextEditingController customInput = TextEditingController();
 
   void _openGallery() {
     if (_image == null) {
@@ -70,23 +77,28 @@ class _ScanPageState extends State<ScanPage> {
 
   @override
   Widget build(BuildContext context) {
-    String gradeValue = UtilData.grades[9];
-    TextEditingController customInput = TextEditingController(text: "");
-
+    
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
+
+    bool gotData() => customInput.text.isNotEmpty || (_image != null);
 
     return Scaffold(
       appBar: const InstasolveAppBar(),
       body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         physics: const BouncingScrollPhysics(),
-        child: SizedBox(
+        child: Container(
+          constraints: BoxConstraints(minHeight: h * 0.9),
           width: w,
-          height: h * 0.9,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Text(
+                "Choose either Image or Image with prompt or only Prompt",
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
               Stack(
                 // alignment: Alignment.center,
                 children: [
@@ -106,7 +118,7 @@ class _ScanPageState extends State<ScanPage> {
                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.grey.shade800),
                         ),
           
-                  Container(
+                  SizedBox(
                     width: 300,
                     height: 300,
                     child: (_image == null)
@@ -120,7 +132,7 @@ class _ScanPageState extends State<ScanPage> {
                             icon: const Icon(Icons.photo, size: 48,),
                             color: Colors.white,
                           ),
-  
+        
                           IconButton(
                             onPressed: () {
                               _openCamera();
@@ -156,13 +168,52 @@ class _ScanPageState extends State<ScanPage> {
               //     );
               //   }).toList(),
               // ),
+      
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: TextField(
+                  controller: customInput,
+                  maxLength: 45,
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.all(16),
+                    label: const Text("Custom Prompt"),
+                    helperText: "solve 5th question.. answer in points.. etc",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    // hintText: "..solve 5th question OR answer in points"
+                  ),
+                
+                ),
+              ),
+      
+              DropdownMenu<String>(
+                width: 350,
+                label: const Text("Question's subject"),
+                menuHeight: 500,
+                leadingIcon: const Icon(Icons.subject_outlined),
+                initialSelection: subjectValue,
+                helperText: "finetune the question based on subject\nsometimes 'Generic' may provide better solutions",
+                onSelected: (String? value) {
+                  setState(() {
+                    subjectValue = value!;
+                  });
+                },
+                dropdownMenuEntries: UtilData.qtypes.keys.map<DropdownMenuEntry<String>>((String val) {
+                  return DropdownMenuEntry<String>(
+                    value: val,
+                    label: val
+                  );
+                }).toList(),
+              ),
           
               DropdownMenu<String>(
-                width: 300,
+                width: 350,
                 label: const Text("Question's Grade level"),
                 menuHeight: 500,
                 leadingIcon: const Icon(Icons.class_outlined),
                 initialSelection: gradeValue,
+                helperText: "question's grade level\nset to no grade to auto determine",
                 onSelected: (String? value) {
                   setState(() {
                     gradeValue = value!;
@@ -176,29 +227,22 @@ class _ScanPageState extends State<ScanPage> {
                 }).toList(),
               ),
           
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: TextField(
-                  controller: customInput,
-                  maxLength: 45,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.all(16),
-                    label: const Text("Custom Prompt"),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    hintText: "..solve 5th question OR answer in points"
-                  ),
-                
-                ),
-              ),
-          
               ElevatedButton.icon(
                 icon: Icon(Icons.home_work_outlined, color: Theme.of(context).colorScheme.onTertiaryContainer,),
-                onPressed: (_image == null) ? null : () {
-                  Navigator.pushNamed(context, AnswerPage.routeName, arguments: {ScanPage.imagePathKey: _image!.path} );
-                },
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.tertiaryContainer)),
+                onPressed: gotData() 
+                  ? () {
+                    Navigator.pushNamed(
+                      context,
+                      AnswerPage.routeName,
+                      arguments: {
+                          ScanPage.imageKey: _image,
+                          ScanPage.promptKey: customInput.text,
+                          ScanPage.gradeKey: gradeValue,
+                        } 
+                      );
+                  }
+                  : null,
+                style: gotData() ? ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.tertiaryContainer)) : ButtonStyle(),
                 label: Text("Solve!", style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer))
               )
           
