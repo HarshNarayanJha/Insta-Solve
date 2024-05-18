@@ -79,26 +79,30 @@ class _ScanPageState extends State<ScanPage> {
   Widget build(BuildContext context) {
     
     double w = MediaQuery.of(context).size.width;
-    double h = MediaQuery.of(context).size.height;
+    // double h = MediaQuery.of(context).size.height;
 
     bool gotData() => customInput.text.isNotEmpty || (_image != null);
 
     return Scaffold(
       appBar: const InstasolveAppBar(),
       body: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         scrollDirection: Axis.vertical,
         physics: const BouncingScrollPhysics(),
         child: Container(
-          constraints: BoxConstraints(minHeight: h * 0.9),
+          constraints: const BoxConstraints.tightForFinite(),
           width: w,
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 20,),
               Text(
                 "Choose either Image or Image with prompt or only Prompt",
                 style: Theme.of(context).textTheme.labelMedium,
               ),
+              const SizedBox(height: 30,),
               Stack(
                 // alignment: Alignment.center,
                 children: [
@@ -132,7 +136,7 @@ class _ScanPageState extends State<ScanPage> {
                             icon: const Icon(Icons.photo, size: 48,),
                             color: Colors.white,
                           ),
-        
+                  
                           IconButton(
                             onPressed: () {
                               _openCamera();
@@ -168,29 +172,34 @@ class _ScanPageState extends State<ScanPage> {
               //     );
               //   }).toList(),
               // ),
-      
+
+              const SizedBox(height: 40,),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: TextField(
-                  controller: customInput,
-                  maxLength: 45,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.all(16),
-                    label: const Text("Custom Prompt"),
-                    helperText: "solve 5th question.. answer in points.. etc",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(4),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  width: 350,
+                  child: TextField(
+                    controller: customInput,
+                    maxLength: 45,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.all(16),
+                      label: const Text("Custom Prompt"),
+                      helperText: "solve 5th question.. answer in points.. etc",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      // hintText: "..solve 5th question OR answer in points"
                     ),
-                    // hintText: "..solve 5th question OR answer in points"
+                  
                   ),
-                
                 ),
               ),
-      
+
+              const SizedBox(height: 40,),
               DropdownMenu<String>(
                 width: 350,
                 label: const Text("Question's subject"),
-                menuHeight: 500,
+                menuHeight: 600,
                 leadingIcon: const Icon(Icons.subject_outlined),
                 initialSelection: subjectValue,
                 helperText: "finetune the question based on subject\nsometimes 'Generic' may provide better solutions",
@@ -206,11 +215,13 @@ class _ScanPageState extends State<ScanPage> {
                   );
                 }).toList(),
               ),
-          
+
+              const SizedBox(height: 40,),
+              
               DropdownMenu<String>(
                 width: 350,
                 label: const Text("Question's Grade level"),
-                menuHeight: 500,
+                menuHeight: 400,
                 leadingIcon: const Icon(Icons.class_outlined),
                 initialSelection: gradeValue,
                 helperText: "question's grade level\nset to no grade to auto determine",
@@ -226,6 +237,8 @@ class _ScanPageState extends State<ScanPage> {
                   );
                 }).toList(),
               ),
+
+              const SizedBox(height: 50,),
           
               ElevatedButton.icon(
                 icon: Icon(Icons.home_work_outlined, color: Theme.of(context).colorScheme.onTertiaryContainer,),
@@ -242,9 +255,11 @@ class _ScanPageState extends State<ScanPage> {
                       );
                   }
                   : null,
-                style: gotData() ? ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.tertiaryContainer)) : ButtonStyle(),
+                style: gotData() ? ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.tertiaryContainer)) : const ButtonStyle(),
                 label: Text("Solve!", style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer))
-              )
+              ),
+
+              const SizedBox(height: 30,),
           
               // const Text("Scan question with your camera"),
               // GestureDetector(
