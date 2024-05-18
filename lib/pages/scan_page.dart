@@ -11,11 +11,13 @@ import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 class ScanPage extends StatefulWidget {
 
 
+
   const ScanPage({super.key});
 
   static const routeName = '/scan';
   static const imageKey = 'image';
   static const promptKey = 'prompt';
+  static const subjectKey = 'subject';
   static const gradeKey = 'grade';
 
   @override
@@ -24,7 +26,7 @@ class ScanPage extends StatefulWidget {
 
 class _ScanPageState extends State<ScanPage> {
   XFile? _image;
-  String subjectValue = UtilData.qtypes.keys.first;
+  Prompt subject = UtilData.qtypes[0];
   String gradeValue = UtilData.grades[9];
   TextEditingController customInput = TextEditingController();
 
@@ -81,14 +83,14 @@ class _ScanPageState extends State<ScanPage> {
     double w = MediaQuery.of(context).size.width;
     // double h = MediaQuery.of(context).size.height;
 
-    bool gotData() => customInput.text.isNotEmpty || (_image != null);
+    bool gotData = customInput.text.isNotEmpty || (_image != null);
 
     return Scaffold(
       appBar: const InstasolveAppBar(),
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         scrollDirection: Axis.vertical,
-        physics: const BouncingScrollPhysics(),
+        physics: (Platform.isLinux) ? const PageScrollPhysics() : const BouncingScrollPhysics(),
         child: Container(
           constraints: const BoxConstraints.tightForFinite(),
           width: w,
@@ -180,7 +182,12 @@ class _ScanPageState extends State<ScanPage> {
                   width: 350,
                   child: TextField(
                     controller: customInput,
-                    maxLength: 45,
+                    onChanged: (String value) {
+                      setState(() {
+                        gotData = customInput.text.isNotEmpty || (_image != null);
+                      });
+                    },
+                    maxLength: 60,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.all(16),
                       label: const Text("Custom Prompt"),
@@ -201,17 +208,17 @@ class _ScanPageState extends State<ScanPage> {
                 label: const Text("Question's subject"),
                 menuHeight: 600,
                 leadingIcon: const Icon(Icons.subject_outlined),
-                initialSelection: subjectValue,
+                initialSelection: subject.name,
                 helperText: "finetune the question based on subject\nsometimes 'Generic' may provide better solutions",
                 onSelected: (String? value) {
                   setState(() {
-                    subjectValue = value!;
+                    subject = Prompt.values.firstWhere((e) => e.name == value!);
                   });
                 },
-                dropdownMenuEntries: UtilData.qtypes.keys.map<DropdownMenuEntry<String>>((String val) {
+                dropdownMenuEntries: UtilData.qtypes.map<DropdownMenuEntry<String>>((Prompt val) {
                   return DropdownMenuEntry<String>(
-                    value: val,
-                    label: val
+                    value: val.name,
+                    label: val.name.toTitleCase()
                   );
                 }).toList(),
               ),
@@ -242,7 +249,7 @@ class _ScanPageState extends State<ScanPage> {
           
               ElevatedButton.icon(
                 icon: Icon(Icons.home_work_outlined, color: Theme.of(context).colorScheme.onTertiaryContainer,),
-                onPressed: gotData() 
+                onPressed: (gotData)
                   ? () {
                     Navigator.pushNamed(
                       context,
@@ -251,17 +258,18 @@ class _ScanPageState extends State<ScanPage> {
                           ScanPage.imageKey: _image,
                           ScanPage.promptKey: customInput.text,
                           ScanPage.gradeKey: gradeValue,
+                          ScanPage.subjectKey: subject,
                         } 
                       );
                   }
                   : null,
-                style: gotData() ? ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.tertiaryContainer)) : const ButtonStyle(),
+                style: (gotData) ? ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.tertiaryContainer)) : const ButtonStyle(),
                 label: Text("Solve!", style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer))
               ),
 
               const SizedBox(height: 30,),
           
-              // const Text("Scan question with your camera"),
+              // const Text("Scan question with your camera"),Content.text(prompt)
               // GestureDetector(
               //   onTap: () => Navigator.pushNamed(context, "/answer"),
               //   child: const Text("Now view answer"),
