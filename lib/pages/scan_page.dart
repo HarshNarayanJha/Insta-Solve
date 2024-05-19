@@ -7,8 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/pages/answer_page.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ScanPage extends StatefulWidget {
+
   const ScanPage({super.key});
 
   static const routeName = '/scan';
@@ -16,6 +18,7 @@ class ScanPage extends StatefulWidget {
   static const promptKey = 'prompt';
   static const subjectKey = 'subject';
   static const gradeKey = 'grade';
+  static const connectionKey = 'connection';
 
   @override
   State<ScanPage> createState() => _ScanPageState();
@@ -314,13 +317,14 @@ class _ScanPageState extends State<ScanPage> {
                     color: Theme.of(context).colorScheme.onTertiaryContainer,
                   ),
                   onPressed: (gotData)
-                      ? () {
+                      ? () async {
                           Navigator.pushNamed(context, AnswerPage.routeName,
                               arguments: {
                                 ScanPage.imageKey: _image,
                                 ScanPage.promptKey: customInput.text,
                                 ScanPage.gradeKey: gradeValue,
                                 ScanPage.subjectKey: subject,
+                                ScanPage.connectionKey: await InternetConnection().hasInternetAccess,
                               });
                         }
                       : null,

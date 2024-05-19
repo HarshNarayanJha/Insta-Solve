@@ -30,6 +30,8 @@ class _AnswerPageState extends State<AnswerPage> {
 
   final textAnimationIndex = Random().nextInt(2);
 
+  double spinnerOpacity = 0;
+
   String responseText = "";
 
   InternetStatus? _connectionStatus;
@@ -40,6 +42,12 @@ class _AnswerPageState extends State<AnswerPage> {
   @override
   void initState() {
     super.initState();
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() {
+        spinnerOpacity = 1;
+      });
+    });
 
     _subscription = InternetConnection().onStatusChange.listen((status) {
       setState(() {
@@ -108,15 +116,22 @@ class _AnswerPageState extends State<AnswerPage> {
     // final tokenCount = await _model.countTokens(content);
     // print('Token count: ${tokenCount.totalTokens}');
 
-    final response = _model.generateContentStream(content);
+    // final response = _model.generateContentStream(content);
+    final response = await _model.generateContent(content);
 
-    await for (final chunk in response) {
-      setState(() {
-        if (chunk.text != null) {
-          responseText += chunk.text!;
-        }
-      });
-    }
+    setState(() {
+      if (response.text != null) {
+        responseText = response.text!;
+      }
+    });
+
+    // await for (final chunk in response) {
+    //   setState(() {
+    //     if (chunk.text != null) {
+    //       responseText += chunk.text!;
+    //     }
+    //   });
+    // }
   }
 
   @override
@@ -127,11 +142,15 @@ class _AnswerPageState extends State<AnswerPage> {
     final String promptText;
     final Prompt subject;
     final String grade;
+    final bool connection;
 
     file = arguments[ScanPage.imageKey];
     promptText = arguments[ScanPage.promptKey];
     subject = arguments[ScanPage.subjectKey];
     grade = arguments[ScanPage.gradeKey];
+    connection = arguments[ScanPage.connectionKey];
+
+    _connectionStatus ??= connection ? InternetStatus.connected : InternetStatus.disconnected;
 
     // print([file, promptText, subject, grade]);
 
@@ -160,11 +179,14 @@ class _AnswerPageState extends State<AnswerPage> {
                 const SizedBox(height: 25),
                 (file != null)
                     ? ImageFrame(file: file)
-                    : Text("No image for this question",
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text("No image for this question",
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall!
-                            .copyWith(color: Colors.grey)),
+                            .copyWith(color: Colors.grey))
+                      ),
                 const SizedBox(height: 20),
                 (promptText.isNotEmpty)
                     ? Padding(
@@ -199,31 +221,35 @@ class _AnswerPageState extends State<AnswerPage> {
                     responseText.isNotEmpty)
                   (responseText.isEmpty)
                       ? Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const SizedBox(height: 20),
-                              const CircularProgressIndicator.adaptive(),
-                              const SizedBox(height: 20),
-                              AnimatedTextKit(
-                                animatedTexts: [
-                                  [
-                                    TypewriterAnimatedText(
-                                        "Generating the Answer...",
-                                        cursor: '|',
-                                        speed:
-                                            const Duration(milliseconds: 100)),
-                                    WavyAnimatedText("Generating the Answer...",
-                                        speed:
-                                            const Duration(milliseconds: 100))
-                                  ][textAnimationIndex]
-                                ],
-                                repeatForever: true,
-                                isRepeatingAnimation: true,
-                              )
-                            ],
+                          child: AnimatedOpacity(
+                            opacity: spinnerOpacity,
+                            duration: const Duration(milliseconds: 250),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 20),
+                                const CircularProgressIndicator.adaptive(),
+                                const SizedBox(height: 20),
+                                AnimatedTextKit(
+                                  animatedTexts: [
+                                    [
+                                      TypewriterAnimatedText(
+                                          "Generating the Answer...",
+                                          cursor: '|',
+                                          speed:
+                                              const Duration(milliseconds: 100)),
+                                      WavyAnimatedText("Generating the Answer...",
+                                          speed:
+                                              const Duration(milliseconds: 100))
+                                    ][textAnimationIndex]
+                                  ],
+                                  repeatForever: true,
+                                  isRepeatingAnimation: true,
+                                )
+                              ],
+                            ),
                           ),
                         )
                       : AnswerViewWidget(

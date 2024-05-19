@@ -44,6 +44,7 @@ dependencies:
   google_generative_ai: ^0.4.0
   envied: ^0.5.4+1
   internet_connection_checker_plus: ^2.3.0
+  hive: ^2.2.3
 
 dev_dependencies:
   flutter_test:

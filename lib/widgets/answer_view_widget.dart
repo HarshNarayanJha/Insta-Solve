@@ -19,55 +19,45 @@ class AnswerViewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: w,
-        child: TeXView(
-          renderingEngine: renderingEngine,
-          child: TeXViewMarkdown(responseText),
-          style: TeXViewStyle(
-            textAlign: TeXViewTextAlign.justify,
-            margin: const TeXViewMargin.all(5),
-            backgroundColor: Theme.of(context)
-                .colorScheme
-                .tertiaryContainer,
-            contentColor: Theme.of(context)
-                .colorScheme
-                .onTertiaryContainer,
-            padding: const TeXViewPadding.all(16),
-            elevation: 5,
-            // height: 100,
-            borderRadius: const TeXViewBorderRadius.all(10),
-          ),
-          loadingWidgetBuilder: (context) => Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator.adaptive(),
-                const SizedBox(
-                  height: 20,
-                ),
-                AnimatedTextKit(
-                  animatedTexts: [
-                    [
-                      WavyAnimatedText(
-                          "Cooking the Answer...",
-                          speed: const Duration(
-                              milliseconds: 100)),
-                      TypewriterAnimatedText(
-                          "Cooking the Answer...",
-                          cursor: '|',
-                          speed: const Duration(
-                              milliseconds: 100)),
-                    ][textAnimationIndex]
-                  ],
-                  repeatForever: true,
-                  isRepeatingAnimation: true,
-                )
-              ],
-            ),
+      width: w,
+      child: TeXView(
+        renderingEngine: renderingEngine,
+        child: TeXViewMarkdown(responseText),
+        style: TeXViewStyle(
+          textAlign: TeXViewTextAlign.justify,
+          margin: const TeXViewMargin.all(5),
+          backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+          contentColor: Theme.of(context).colorScheme.onTertiaryContainer,
+          padding: const TeXViewPadding.all(16),
+          elevation: 5,
+          // height: 100,
+          borderRadius: const TeXViewBorderRadius.all(10),
+        ),
+        loadingWidgetBuilder: (context) => Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              const CircularProgressIndicator.adaptive(),
+              const SizedBox(height: 20),
+              AnimatedTextKit(
+                animatedTexts: [
+                  [
+                    WavyAnimatedText("Cooking the Answer...",
+                        speed: const Duration(milliseconds: 100)),
+                    TypewriterAnimatedText("Cooking the Answer...",
+                        cursor: '|', speed: const Duration(milliseconds: 100)),
+                  ][textAnimationIndex]
+                ],
+                repeatForever: true,
+                isRepeatingAnimation: true,
+              )
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
