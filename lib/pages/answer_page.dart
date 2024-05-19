@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
@@ -9,7 +9,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/env/env.dart';
 import 'package:insta_solve/pages/scan_page.dart';
+import 'package:insta_solve/widgets/answer_view_widget.dart';
+import 'package:insta_solve/widgets/image_frame.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
+import 'package:insta_solve/widgets/no_connection_widget.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class AnswerPage extends StatefulWidget {
   const AnswerPage({super.key});
@@ -28,23 +32,37 @@ class _AnswerPageState extends State<AnswerPage> {
 
   String responseText = "";
 
+  InternetStatus? _connectionStatus;
+  late StreamSubscription<InternetStatus> _subscription;
+
   late final GenerativeModel _model;
 
   @override
   void initState() {
     super.initState();
 
+    _subscription = InternetConnection().onStatusChange.listen((status) {
+      setState(() {
+        _connectionStatus = status;
+      });
+    });
+
     GenerationConfig generationConfig = GenerationConfig(
       temperature: 0.2,
       topK: 1,
       topP: 1,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 1024,
     );
     _model = GenerativeModel(
-      model: 'gemini-1.5-pro-latest',
-      apiKey: Env.apiKey,
-      generationConfig: generationConfig
-    );
+        model: 'gemini-1.5-pro-latest',
+        apiKey: Env.apiKey,
+        generationConfig: generationConfig);
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   Future<void> getResponse(
@@ -63,8 +81,7 @@ class _AnswerPageState extends State<AnswerPage> {
     Content? gradePrompt;
     // the first grade is No specific grade, so set
     if (grade != UtilData.grades.first) {
-      gradePrompt = Content.text(
-          "You are also given the grade (class) for the question. It is $grade. Answer such that a student of $grade grade can understand the answer and language");
+      gradePrompt = Content.text(UtilData.getGradeString(grade));
     }
 
     // add the grade prompt if it is
@@ -84,9 +101,9 @@ class _AnswerPageState extends State<AnswerPage> {
       content.add(Content.text(userPrompt));
     }
 
-    content.forEach((element) {
-      print(element.toJson());
-    });
+    // content.forEach((element) {
+    //   print(element.toJson());
+    // });
 
     // final tokenCount = await _model.countTokens(content);
     // print('Token count: ${tokenCount.totalTokens}');
@@ -116,235 +133,91 @@ class _AnswerPageState extends State<AnswerPage> {
     subject = arguments[ScanPage.subjectKey];
     grade = arguments[ScanPage.gradeKey];
 
-    print([file, promptText, subject, grade]);
+    // print([file, promptText, subject, grade]);
 
     if (responseText.isEmpty) {
-      getResponse(file, promptText, subject, grade);
+      if (_connectionStatus == InternetStatus.connected) {
+        getResponse(file, promptText, subject, grade);
+      }
     }
 
     double w = MediaQuery.of(context).size.width;
     // double h = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: const InstasolveAppBar(),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        physics: (Platform.isLinux)
-            ? const PageScrollPhysics()
-            : const ClampingScrollPhysics(),
-        child: Container(
-          constraints: const BoxConstraints.tightForFinite(),
-          width: w,
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 25),
-              (file != null)
-                  ? Image.file(
-                      File(file.path),
-                      frameBuilder:
-                          (context, child, frame, wasSynchronouslyLoaded) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .tertiaryContainer,
-                                borderRadius: BorderRadius.circular(8)),
-                            padding: const EdgeInsets.all(8.0),
-                            child: child,
-                          ),
-                        );
-                      },
-                    )
-                  : Text("No image for this question",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall!
-                          .copyWith(color: Colors.grey)),
-
-              const SizedBox(height: 20),
-              (promptText.isNotEmpty)
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(promptText,
-                          style: Theme.of(context).textTheme.headlineMedium),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text("No prompt for this question",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(color: Colors.grey)),
-                    ),
-              // GestureDetector(
-              //   onTap: () => Navigator.popUntil(context, ModalRoute.withName("/scan")),
-              //   child: const Text("Answers to all your academic questions")
-              // )
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: AnimatedTextKit(
-                  animatedTexts: [
-                    TyperAnimatedText("Answer :",
-                        textStyle: Theme.of(context)
+        appBar: const InstasolveAppBar(),
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          physics: const ClampingScrollPhysics(),
+          child: Container(
+            constraints: const BoxConstraints.tightForFinite(),
+            width: w,
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 25),
+                (file != null)
+                    ? ImageFrame(file: file)
+                    : Text("No image for this question",
+                        style: Theme.of(context)
                             .textTheme
-                            .headlineLarge
-                            ?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline),
-                        speed: const Duration(milliseconds: 200)),
-                  ],
-                  isRepeatingAnimation: false,
-                ),
-              ),
-
-              // Card(
-              //   elevation: 10,
-              //   shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(10)),
-              //   color: Theme.of(context).colorScheme.tertiaryContainer,
-              //   child: Container(
-              //     width: w,
-              //     height: 800,
-              //     padding: const EdgeInsets.all(8.0),
-              //     child: Markdown(data: responseText, styleSheet: MarkdownStyleSheet(
-              //             p: TextStyle(
-              //                 color: Colors.yellow,
-              //                 fontSize: 16)),
-              //         builders: {
-              //           'latex': LatexElementBuilder(
-              //             textStyle: TextStyle(
-              //                 color: Colors.blue,
-              //                 fontSize: 18),
-              //           ),
-              //         },  extensionSet: md.ExtensionSet(
-              //           [LatexBlockSyntax()],
-              //           [LatexInlineSyntax()],
-              //         ),),
-              //   ),
-              // ),
-
-              // Text(responseText),
-              // Card(
-              //   elevation: 10,
-              //   shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(10)),
-              //   color: Theme.of(context).colorScheme.tertiaryContainer,
-              //   child: Container(
-              //     width: w,
-              //     padding: const EdgeInsets.all(24),
-              //     child: MarkdownBody(
-              //       selectable: true,
-              //       data: responseText,
-              //       styleSheet: MarkdownStyleSheet(
-              //           p: TextStyle(
-              //               color: Theme.of(context)
-              //                   .colorScheme
-              //                   .onTertiaryContainer,
-              //               fontSize: 16)),
-              //       builders: {
-              //         'latex': LatexElementBuilder(
-              //           textStyle: TextStyle(
-              //               color: Theme.of(context)
-              //                   .colorScheme
-              //                   .onTertiaryContainer,
-              //               fontSize: 20),
-              //         ),
-              //       },
-              //       extensionSet: md.ExtensionSet(
-              //         [LatexBlockSyntax()],
-              //         [LatexInlineSyntax()],
-              //       ),
-              //     ),
-              //   ),
-              // ),
-
-              // Card(
-              //   elevation: 10,
-              //   shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(10)),
-              //   color: Theme.of(context).colorScheme.tertiaryContainer,
-              //   child: Container(
-              //     width: w,
-              //     padding: const EdgeInsets.all(8.0),
-              //     child: SelectableText(responseText
-              //         // child: Text(
-              //         // responseText,
-              //         // ),
-              //         ),
-              //   ),
-              // ),
-
-              (responseText.isEmpty)
-                  ? Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 20),
-                          const CircularProgressIndicator.adaptive(),
-                          const SizedBox(height: 20),
-                          AnimatedTextKit(
-                            animatedTexts: [
-                              [
-                                TypewriterAnimatedText(
-                                    "Generating the Answer...",
-                                    cursor: '|',
-                                    speed: const Duration(milliseconds: 100)),
-                                WavyAnimatedText("Generating the Answer...",
-                                    speed: const Duration(milliseconds: 100))
-                              ][textAnimationIndex]
-                            ],
-                            repeatForever: true,
-                            isRepeatingAnimation: true,
-                          )
-                        ],
+                            .bodySmall!
+                            .copyWith(color: Colors.grey)),
+                const SizedBox(height: 20),
+                (promptText.isNotEmpty)
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(promptText,
+                            style: Theme.of(context).textTheme.headlineMedium),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text("No prompt for this question",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(color: Colors.grey)),
                       ),
-                    )
-                  : SizedBox(
-                      width: w,
-                      child: TeXView(
-                        renderingEngine: renderingEngine,
-                        child: TeXViewMarkdown(responseText),
-                        style: TeXViewStyle(
-                          textAlign: TeXViewTextAlign.justify,
-                          margin: const TeXViewMargin.all(5),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.tertiaryContainer,
-                          contentColor:
-                              Theme.of(context).colorScheme.onTertiaryContainer,
-                          padding: const TeXViewPadding.all(16),
-                          elevation: 5,
-                          // height: 100,
-                          borderRadius: const TeXViewBorderRadius.all(10),
-                        ),
-                        loadingWidgetBuilder: (context) => Center(
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      TyperAnimatedText("Answer :",
+                          textStyle: Theme.of(context)
+                              .textTheme
+                              .headlineLarge
+                              ?.copyWith(fontWeight: FontWeight.w500),
+                          speed: const Duration(milliseconds: 200)),
+                    ],
+                    isRepeatingAnimation: false,
+                  ),
+                ),
+                if (_connectionStatus == InternetStatus.connected ||
+                    responseText.isNotEmpty)
+                  (responseText.isEmpty)
+                      ? Center(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              const SizedBox(height: 20),
                               const CircularProgressIndicator.adaptive(),
-                              const SizedBox(
-                                height: 20,
-                              ),
+                              const SizedBox(height: 20),
                               AnimatedTextKit(
                                 animatedTexts: [
                                   [
-                                    WavyAnimatedText("Cooking the Answer...",
-                                        speed:
-                                            const Duration(milliseconds: 100)),
                                     TypewriterAnimatedText(
-                                        "Cooking the Answer...",
+                                        "Generating the Answer...",
                                         cursor: '|',
                                         speed:
                                             const Duration(milliseconds: 100)),
+                                    WavyAnimatedText("Generating the Answer...",
+                                        speed:
+                                            const Duration(milliseconds: 100))
                                   ][textAnimationIndex]
                                 ],
                                 repeatForever: true,
@@ -352,14 +225,18 @@ class _AnswerPageState extends State<AnswerPage> {
                               )
                             ],
                           ),
-                        ),
-                      ),
-                    ),
-              const SizedBox(height: 20),
-            ],
+                        )
+                      : AnswerViewWidget(
+                          w: w,
+                          renderingEngine: renderingEngine,
+                          responseText: responseText,
+                          textAnimationIndex: textAnimationIndex)
+                else
+                  const NoConnectionWidget(),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

@@ -20,6 +20,10 @@ class UtilData {
     'Post 12'
   ];
 
+  static String getGradeString(String grade) {
+    return "You are also given the grade (class) for the question. It is $grade. Answer such that a student of $grade grade can understand the answer and language";
+  }
+
   static const Map<Prompt, String> prompts = {
     Prompt.genericPhoto:
         """Solve the question in the photo. You are not supposed to ask any other questions besides the provided image. You are only allowed to answer academic and study related questions. Refuse to answer all other types of questions and respond to them with "Ask only study related questions, and focus on your studies kid"
@@ -49,15 +53,6 @@ class UtilData {
                 You will be given a hindi question, and you need to answer the question. No matra mistakes must be made. Make use of emojis
                 """
   };
-
-  // static const Map<String, Prompt> qtypes = {
-  //   // first is always generic
-  //   'Generic': Prompt.generic,
-  //   'Maths': Prompt.math,
-  //   'Social Science': Prompt.social,
-  //   'English': Prompt.english,
-  //   'Hindi': Prompt.hindi,
-  // };
 
   static const qtypes = [
     Prompt.generic,

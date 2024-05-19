@@ -48,8 +48,8 @@ class _ScanPageState extends State<ScanPage> {
 
   Future<void> _getImageFrom(ImageSource imageSource) async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: imageSource, imageQuality: 50);
-
+    final XFile? image =
+        await picker.pickImage(source: imageSource, imageQuality: 50);
 
     if (image != null) {
       ImageCropper cropper = ImageCropper();
@@ -128,9 +128,7 @@ class _ScanPageState extends State<ScanPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               Text(
                 "Choose either Image or Image with prompt or only Prompt.",
                 style: Theme.of(context).textTheme.labelMedium,
@@ -138,36 +136,36 @@ class _ScanPageState extends State<ScanPage> {
               ),
               Text(
                 "NOTE: if the app closes after taking a photo, reopen this screen to get the photo back",
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey.shade600),
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: Colors.grey.shade600),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               Stack(
                 // alignment: Alignment.center,
                 children: [
-                  (_image == null)
-                      ? ImageFiltered(
-                          imageFilter: ImageFilter.blur(
-                              sigmaX: 5.0,
-                              sigmaY: 5.0,
-                              tileMode: TileMode.decal),
-                          child: Container(
-                            width: 300,
-                            height: 300,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Colors.grey.shade800),
-                          ),
-                        )
-                      : Container(
-                          width: 300,
-                          height: 300,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.grey.shade800),
-                        ),
+                  if (_image == null)
+                    ImageFiltered(
+                      imageFilter: ImageFilter.blur(
+                          sigmaX: 5.0, sigmaY: 5.0, tileMode: TileMode.decal),
+                      child: Container(
+                        width: 300,
+                        height: 300,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey.shade800),
+                      ),
+                    )
+                  else
+                    Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.grey.shade800),
+                    ),
                   SizedBox(
                     width: 300,
                     height: 300,
@@ -237,27 +235,6 @@ class _ScanPageState extends State<ScanPage> {
                 ],
               ),
 
-              // DropdownButton<String>(
-              //   value: gradeValue,
-              //   icon: const Icon(Icons.class_outlined),
-              //   elevation: 16,
-              //   underline: Container(
-              //     height: 2,
-              //     color: Theme.of(context).colorScheme.primary,
-              //   ),
-              //   onChanged: (String? value) {
-              //     setState(() {
-              //       gradeValue = value!;
-              //     });
-              //   },
-              //   items: UtilData.grades.map<DropdownMenuItem<String>>((String val) {
-              //     return DropdownMenuItem<String>(
-              //       value: val,
-              //       child: Text(val)
-              //     );
-              //   }).toList(),
-              // ),
-
               const SizedBox(
                 height: 40,
               ),
@@ -287,9 +264,7 @@ class _ScanPageState extends State<ScanPage> {
                 ),
               ),
 
-              const SizedBox(
-                height: 40,
-              ),
+              const SizedBox(height: 40),
               DropdownMenu<String>(
                 width: 350,
                 label: const Text("Question's subject"),
@@ -310,9 +285,7 @@ class _ScanPageState extends State<ScanPage> {
                 }).toList(),
               ),
 
-              const SizedBox(
-                height: 40,
-              ),
+              const SizedBox(height: 40),
 
               DropdownMenu<String>(
                 width: 350,
@@ -333,9 +306,7 @@ class _ScanPageState extends State<ScanPage> {
                 }).toList(),
               ),
 
-              const SizedBox(
-                height: 50,
-              ),
+              const SizedBox(height: 50),
 
               ElevatedButton.icon(
                   icon: Icon(
@@ -355,7 +326,7 @@ class _ScanPageState extends State<ScanPage> {
                       : null,
                   style: (gotData)
                       ? ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).colorScheme.tertiaryContainer))
                       : const ButtonStyle(),
                   label: Text("Solve!",
@@ -364,9 +335,7 @@ class _ScanPageState extends State<ScanPage> {
                               .colorScheme
                               .onTertiaryContainer))),
 
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
 
               // const Text("Scan question with your camera"),Content.text(prompt)
               // GestureDetector(

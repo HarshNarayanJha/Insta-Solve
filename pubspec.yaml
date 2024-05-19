@@ -42,9 +42,8 @@ dependencies:
   flutter_tex: ^4.0.6
   animated_text_kit: ^4.2.2
   google_generative_ai: ^0.4.0
-  flutter_markdown_latex: ^0.3.2
-  flutter_markdown: ^0.7.1
   envied: ^0.5.4+1
+  internet_connection_checker_plus: ^2.3.0
 
 dev_dependencies:
   flutter_test:
