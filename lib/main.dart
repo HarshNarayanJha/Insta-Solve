@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Instasolve',
-      theme: brightness == Brightness.light ? theme.dark() : theme.light(),
+      theme: brightness == Brightness.light ? theme.light() : theme.dark(),
       
       home: const HomePage(),
       routes: {

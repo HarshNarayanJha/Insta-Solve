@@ -9,9 +9,6 @@ import 'package:insta_solve/pages/answer_page.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 
 class ScanPage extends StatefulWidget {
-
-
-
   const ScanPage({super.key});
 
   static const routeName = '/scan';
@@ -29,6 +26,13 @@ class _ScanPageState extends State<ScanPage> {
   Prompt subject = UtilData.qtypes[0];
   String gradeValue = UtilData.grades[9];
   TextEditingController customInput = TextEditingController();
+  bool imageOverlayVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkForImagePickerLostData();
+  }
 
   void _openGallery() {
     if (_image == null) {
@@ -44,15 +48,13 @@ class _ScanPageState extends State<ScanPage> {
 
   Future<void> _getImageFrom(ImageSource imageSource) async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: imageSource);
+    final XFile? image = await picker.pickImage(source: imageSource, imageQuality: 50);
+
 
     if (image != null) {
       ImageCropper cropper = ImageCropper();
       final croppedImage = await cropper.cropImage(
-        // context: context,
         sourcePath: image.path,
-        // imageBytes: await image.readAsBytes(),
-        // onImageDoneListener: (data) {}
         aspectRatioPresets: [
           CropAspectRatioPreset.square,
           CropAspectRatioPreset.ratio16x9,
@@ -62,13 +64,9 @@ class _ScanPageState extends State<ScanPage> {
         ],
         uiSettings: [
           AndroidUiSettings(
-            toolbarTitle: "Cropping One Question",
-            lockAspectRatio: false
-          ),
+              toolbarTitle: "Cropping One Question", lockAspectRatio: false),
           IOSUiSettings(
-            title: "Cropping One Question",
-            aspectRatioLockEnabled: false
-          ),
+              title: "Cropping One Question", aspectRatioLockEnabled: false),
         ],
       );
       setState(() {
@@ -77,9 +75,38 @@ class _ScanPageState extends State<ScanPage> {
     }
   }
 
+  Future<void> _checkForImagePickerLostData() async {
+    final ImagePicker picker = ImagePicker();
+    final LostDataResponse response = await picker.retrieveLostData();
+    if (response.isEmpty) {
+      print("No lost File found");
+      return;
+    }
+    final List<XFile>? files = response.files;
+    if (files != null) {
+      print("Lost files $files");
+      setState(() {
+        _image = files.first;
+      });
+      print(_image?.path ?? 'no path');
+    }
+  }
+
+  void _toggleImageOverlay() {
+    setState(() {
+      imageOverlayVisible = !imageOverlayVisible;
+    });
+  }
+
+  void _removeImage() {
+    setState(() {
+      _image = null;
+      imageOverlayVisible = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    
     double w = MediaQuery.of(context).size.width;
     // double h = MediaQuery.of(context).size.height;
 
@@ -90,7 +117,9 @@ class _ScanPageState extends State<ScanPage> {
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         scrollDirection: Axis.vertical,
-        physics: (Platform.isLinux) ? const PageScrollPhysics() : const BouncingScrollPhysics(),
+        physics: (Platform.isLinux)
+            ? const PageScrollPhysics()
+            : const BouncingScrollPhysics(),
         child: Container(
           constraints: const BoxConstraints.tightForFinite(),
           width: w,
@@ -99,61 +128,115 @@ class _ScanPageState extends State<ScanPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20,),
-              Text(
-                "Choose either Image or Image with prompt or only Prompt",
-                style: Theme.of(context).textTheme.labelMedium,
+              const SizedBox(
+                height: 20,
               ),
-              const SizedBox(height: 30,),
+              Text(
+                "Choose either Image or Image with prompt or only Prompt.",
+                style: Theme.of(context).textTheme.labelMedium,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                "NOTE: if the app closes after taking a photo, reopen this screen to get the photo back",
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                height: 30,
+              ),
               Stack(
                 // alignment: Alignment.center,
                 children: [
-          
-                  (_image == null) 
-                    ? ImageFiltered(
-                        imageFilter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0, tileMode: TileMode.decal),
-                        child: Container(
+                  (_image == null)
+                      ? ImageFiltered(
+                          imageFilter: ImageFilter.blur(
+                              sigmaX: 5.0,
+                              sigmaY: 5.0,
+                              tileMode: TileMode.decal),
+                          child: Container(
+                            width: 300,
+                            height: 300,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.grey.shade800),
+                          ),
+                        )
+                      : Container(
                           width: 300,
                           height: 300,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.grey.shade800),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey.shade800),
                         ),
-                      )
-                    : Container(
-                          width: 300,
-                          height: 300,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.grey.shade800),
-                        ),
-          
                   SizedBox(
                     width: 300,
                     height: 300,
                     child: (_image == null)
-                      ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _openGallery();
-                            },
-                            icon: const Icon(Icons.photo, size: 48,),
-                            color: Colors.white,
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  _openGallery();
+                                },
+                                icon: const Icon(
+                                  Icons.photo,
+                                  size: 48,
+                                ),
+                                color: Colors.white,
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  _openCamera();
+                                },
+                                icon: const Icon(
+                                  Icons.camera_alt,
+                                  size: 48,
+                                ),
+                                color: Colors.white,
+                              ),
+                            ],
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Stack(children: [
+                              GestureDetector(
+                                  onTap: () {
+                                    _toggleImageOverlay();
+                                  },
+                                  child: Center(
+                                      child: Image.file(File(_image!.path)))),
+                              AnimatedOpacity(
+                                opacity: imageOverlayVisible ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 250),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _toggleImageOverlay();
+                                  },
+                                  child: Container(
+                                      height: 300,
+                                      width: 300,
+                                      decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.6)),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          _removeImage();
+                                        },
+                                        child: const Icon(
+                                          Icons.delete_forever_outlined,
+                                          color: Colors.red,
+                                          semanticLabel: "Close Image",
+                                          size: 72,
+                                        ),
+                                      )),
+                                ),
+                              ),
+                            ]),
                           ),
-                  
-                          IconButton(
-                            onPressed: () {
-                              _openCamera();
-                            },
-                            icon: const Icon(Icons.camera_alt, size: 48,),
-                            color: Colors.white,
-                          ),
-                        ],
-                      )
-                      : Image.file(File(_image!.path)),
                   ),
-                  
                 ],
               ),
-          
+
               // DropdownButton<String>(
               //   value: gradeValue,
               //   icon: const Icon(Icons.class_outlined),
@@ -175,16 +258,19 @@ class _ScanPageState extends State<ScanPage> {
               //   }).toList(),
               // ),
 
-              const SizedBox(height: 40,),
+              const SizedBox(
+                height: 40,
+              ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: SizedBox(
                   width: 350,
                   child: TextField(
                     controller: customInput,
                     onChanged: (String value) {
                       setState(() {
-                        gotData = customInput.text.isNotEmpty || (_image != null);
+                        gotData =
+                            customInput.text.isNotEmpty || (_image != null);
                       });
                     },
                     maxLength: 60,
@@ -197,78 +283,91 @@ class _ScanPageState extends State<ScanPage> {
                       ),
                       // hintText: "..solve 5th question OR answer in points"
                     ),
-                  
                   ),
                 ),
               ),
 
-              const SizedBox(height: 40,),
+              const SizedBox(
+                height: 40,
+              ),
               DropdownMenu<String>(
                 width: 350,
                 label: const Text("Question's subject"),
                 menuHeight: 600,
                 leadingIcon: const Icon(Icons.subject_outlined),
                 initialSelection: subject.name,
-                helperText: "finetune the question based on subject\nsometimes 'Generic' may provide better solutions",
+                helperText:
+                    "finetune the question based on subject\nsometimes 'Generic' may provide better solutions",
                 onSelected: (String? value) {
                   setState(() {
                     subject = Prompt.values.firstWhere((e) => e.name == value!);
                   });
                 },
-                dropdownMenuEntries: UtilData.qtypes.map<DropdownMenuEntry<String>>((Prompt val) {
+                dropdownMenuEntries: UtilData.qtypes
+                    .map<DropdownMenuEntry<String>>((Prompt val) {
                   return DropdownMenuEntry<String>(
-                    value: val.name,
-                    label: val.name.toTitleCase()
-                  );
+                      value: val.name, label: val.name.toTitleCase());
                 }).toList(),
               ),
 
-              const SizedBox(height: 40,),
-              
+              const SizedBox(
+                height: 40,
+              ),
+
               DropdownMenu<String>(
                 width: 350,
                 label: const Text("Question's Grade level"),
                 menuHeight: 400,
                 leadingIcon: const Icon(Icons.class_outlined),
                 initialSelection: gradeValue,
-                helperText: "question's grade level\nset to no grade to auto determine",
+                helperText:
+                    "question's grade level\nset to no grade to auto determine",
                 onSelected: (String? value) {
                   setState(() {
                     gradeValue = value!;
                   });
                 },
-                dropdownMenuEntries: UtilData.grades.map<DropdownMenuEntry<String>>((String val) {
-                  return DropdownMenuEntry<String>(
-                    value: val,
-                    label: val
-                  );
+                dropdownMenuEntries: UtilData.grades
+                    .map<DropdownMenuEntry<String>>((String val) {
+                  return DropdownMenuEntry<String>(value: val, label: val);
                 }).toList(),
               ),
 
-              const SizedBox(height: 50,),
-          
-              ElevatedButton.icon(
-                icon: Icon(Icons.home_work_outlined, color: Theme.of(context).colorScheme.onTertiaryContainer,),
-                onPressed: (gotData)
-                  ? () {
-                    Navigator.pushNamed(
-                      context,
-                      AnswerPage.routeName,
-                      arguments: {
-                          ScanPage.imageKey: _image,
-                          ScanPage.promptKey: customInput.text,
-                          ScanPage.gradeKey: gradeValue,
-                          ScanPage.subjectKey: subject,
-                        } 
-                      );
-                  }
-                  : null,
-                style: (gotData) ? ButtonStyle(backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.tertiaryContainer)) : const ButtonStyle(),
-                label: Text("Solve!", style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer))
+              const SizedBox(
+                height: 50,
               ),
 
-              const SizedBox(height: 30,),
-          
+              ElevatedButton.icon(
+                  icon: Icon(
+                    Icons.home_work_outlined,
+                    color: Theme.of(context).colorScheme.onTertiaryContainer,
+                  ),
+                  onPressed: (gotData)
+                      ? () {
+                          Navigator.pushNamed(context, AnswerPage.routeName,
+                              arguments: {
+                                ScanPage.imageKey: _image,
+                                ScanPage.promptKey: customInput.text,
+                                ScanPage.gradeKey: gradeValue,
+                                ScanPage.subjectKey: subject,
+                              });
+                        }
+                      : null,
+                  style: (gotData)
+                      ? ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.tertiaryContainer))
+                      : const ButtonStyle(),
+                  label: Text("Solve!",
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onTertiaryContainer))),
+
+              const SizedBox(
+                height: 30,
+              ),
+
               // const Text("Scan question with your camera"),Content.text(prompt)
               // GestureDetector(
               //   onTap: () => Navigator.pushNamed(context, "/answer"),

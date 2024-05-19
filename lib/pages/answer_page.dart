@@ -1,17 +1,15 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-// import 'package:flutter_tex/flutter_tex.dart'
+import 'package:flutter_tex/flutter_tex.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/env/env.dart';
 import 'package:insta_solve/pages/scan_page.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
-import 'package:flutter_markdown_latex/flutter_markdown_latex.dart';
-import 'package:markdown/markdown.dart' as md;
 
 class AnswerPage extends StatefulWidget {
   const AnswerPage({super.key});
@@ -23,7 +21,11 @@ class AnswerPage extends StatefulWidget {
 }
 
 class _AnswerPageState extends State<AnswerPage> {
-  // final TeXViewRenderingEngine renderingEngine = const TeXViewRenderingEngine.katex();
+  final TeXViewRenderingEngine renderingEngine =
+      const TeXViewRenderingEngine.mathjax();
+
+  final textAnimationIndex = Random().nextInt(2);
+
   String responseText = "";
 
   late final GenerativeModel _model;
@@ -31,8 +33,18 @@ class _AnswerPageState extends State<AnswerPage> {
   @override
   void initState() {
     super.initState();
-    _model =
-        GenerativeModel(model: 'gemini-1.5-pro-latest', apiKey: Env.apiKey);
+
+    GenerationConfig generationConfig = GenerationConfig(
+      temperature: 0.2,
+      topK: 1,
+      topP: 1,
+      maxOutputTokens: 2048,
+    );
+    _model = GenerativeModel(
+      model: 'gemini-1.5-pro-latest',
+      apiKey: Env.apiKey,
+      generationConfig: generationConfig
+    );
   }
 
   Future<void> getResponse(
@@ -72,7 +84,9 @@ class _AnswerPageState extends State<AnswerPage> {
       content.add(Content.text(userPrompt));
     }
 
-    content.forEach((element) { print(element.toJson()); });
+    content.forEach((element) {
+      print(element.toJson());
+    });
 
     // final tokenCount = await _model.countTokens(content);
     // print('Token count: ${tokenCount.totalTokens}');
@@ -117,7 +131,7 @@ class _AnswerPageState extends State<AnswerPage> {
         scrollDirection: Axis.vertical,
         physics: (Platform.isLinux)
             ? const PageScrollPhysics()
-            : const BouncingScrollPhysics(),
+            : const ClampingScrollPhysics(),
         child: Container(
           constraints: const BoxConstraints.tightForFinite(),
           width: w,
@@ -152,18 +166,26 @@ class _AnswerPageState extends State<AnswerPage> {
                           .bodySmall!
                           .copyWith(color: Colors.grey)),
 
+              const SizedBox(height: 20),
               (promptText.isNotEmpty)
-                  ? Text(promptText,
-                      style: Theme.of(context).textTheme.headlineMedium)
-                  : Text("No prompt for this question",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall!
-                          .copyWith(color: Colors.grey)),
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(promptText,
+                          style: Theme.of(context).textTheme.headlineMedium),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text("No prompt for this question",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(color: Colors.grey)),
+                    ),
               // GestureDetector(
               //   onTap: () => Navigator.popUntil(context, ModalRoute.withName("/scan")),
               //   child: const Text("Answers to all your academic questions")
               // )
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: AnimatedTextKit(
@@ -181,62 +203,159 @@ class _AnswerPageState extends State<AnswerPage> {
                 ),
               ),
 
-              // Text(responseText),
-              Card(
-                elevation: 10,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                color: Theme.of(context).colorScheme.tertiaryContainer,
-                child: Container(
-                  width: w,
-                  padding: const EdgeInsets.all(8.0),
-                  child: MarkdownBody(
-                    selectable: true,
-                    data: responseText,
-                    styleSheet: MarkdownStyleSheet(
-                        p: TextStyle(
-                      color: Theme.of(context).colorScheme.onTertiaryContainer,
-                    )),
-                    builders: {
-                      'latex': LatexElementBuilder(
-                        textStyle: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onTertiaryContainer),
-                      ),
-                    },
-                    extensionSet: md.ExtensionSet(
-                      [LatexBlockSyntax()],
-                      [LatexInlineSyntax()],
-                    ),
-                  ),
-                ),
-              ),
-
-              // TeXView(
-              //   renderingEngine: renderingEngine,
-              //   child: TeXViewMarkdown(responseText),
-              //   style: const TeXViewStyle(
-              //     margin: TeXViewMargin.all(10),
-              //     padding: TeXViewPadding.all(20),
-              //     elevation: 10,
-              //     borderRadius: TeXViewBorderRadius.all(25),
+              // Card(
+              //   elevation: 10,
+              //   shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(10)),
+              //   color: Theme.of(context).colorScheme.tertiaryContainer,
+              //   child: Container(
+              //     width: w,
+              //     height: 800,
+              //     padding: const EdgeInsets.all(8.0),
+              //     child: Markdown(data: responseText, styleSheet: MarkdownStyleSheet(
+              //             p: TextStyle(
+              //                 color: Colors.yellow,
+              //                 fontSize: 16)),
+              //         builders: {
+              //           'latex': LatexElementBuilder(
+              //             textStyle: TextStyle(
+              //                 color: Colors.blue,
+              //                 fontSize: 18),
+              //           ),
+              //         },  extensionSet: md.ExtensionSet(
+              //           [LatexBlockSyntax()],
+              //           [LatexInlineSyntax()],
+              //         ),),
               //   ),
-              //   loadingWidgetBuilder: (context) => const Center(
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.center,
-              //       mainAxisSize: MainAxisSize.min,
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         CircularProgressIndicator.adaptive(),
-              //         SizedBox(
-              //           height: 20,
+              // ),
+
+              // Text(responseText),
+              // Card(
+              //   elevation: 10,
+              //   shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(10)),
+              //   color: Theme.of(context).colorScheme.tertiaryContainer,
+              //   child: Container(
+              //     width: w,
+              //     padding: const EdgeInsets.all(24),
+              //     child: MarkdownBody(
+              //       selectable: true,
+              //       data: responseText,
+              //       styleSheet: MarkdownStyleSheet(
+              //           p: TextStyle(
+              //               color: Theme.of(context)
+              //                   .colorScheme
+              //                   .onTertiaryContainer,
+              //               fontSize: 16)),
+              //       builders: {
+              //         'latex': LatexElementBuilder(
+              //           textStyle: TextStyle(
+              //               color: Theme.of(context)
+              //                   .colorScheme
+              //                   .onTertiaryContainer,
+              //               fontSize: 20),
               //         ),
-              //         Text("Cooking the answer...")
-              //       ],
+              //       },
+              //       extensionSet: md.ExtensionSet(
+              //         [LatexBlockSyntax()],
+              //         [LatexInlineSyntax()],
+              //       ),
               //     ),
               //   ),
               // ),
+
+              // Card(
+              //   elevation: 10,
+              //   shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(10)),
+              //   color: Theme.of(context).colorScheme.tertiaryContainer,
+              //   child: Container(
+              //     width: w,
+              //     padding: const EdgeInsets.all(8.0),
+              //     child: SelectableText(responseText
+              //         // child: Text(
+              //         // responseText,
+              //         // ),
+              //         ),
+              //   ),
+              // ),
+
+              (responseText.isEmpty)
+                  ? Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 20),
+                          const CircularProgressIndicator.adaptive(),
+                          const SizedBox(height: 20),
+                          AnimatedTextKit(
+                            animatedTexts: [
+                              [
+                                TypewriterAnimatedText(
+                                    "Generating the Answer...",
+                                    cursor: '|',
+                                    speed: const Duration(milliseconds: 100)),
+                                WavyAnimatedText("Generating the Answer...",
+                                    speed: const Duration(milliseconds: 100))
+                              ][textAnimationIndex]
+                            ],
+                            repeatForever: true,
+                            isRepeatingAnimation: true,
+                          )
+                        ],
+                      ),
+                    )
+                  : SizedBox(
+                      width: w,
+                      child: TeXView(
+                        renderingEngine: renderingEngine,
+                        child: TeXViewMarkdown(responseText),
+                        style: TeXViewStyle(
+                          textAlign: TeXViewTextAlign.justify,
+                          margin: const TeXViewMargin.all(5),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.tertiaryContainer,
+                          contentColor:
+                              Theme.of(context).colorScheme.onTertiaryContainer,
+                          padding: const TeXViewPadding.all(16),
+                          elevation: 5,
+                          // height: 100,
+                          borderRadius: const TeXViewBorderRadius.all(10),
+                        ),
+                        loadingWidgetBuilder: (context) => Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const CircularProgressIndicator.adaptive(),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              AnimatedTextKit(
+                                animatedTexts: [
+                                  [
+                                    WavyAnimatedText("Cooking the Answer...",
+                                        speed:
+                                            const Duration(milliseconds: 100)),
+                                    TypewriterAnimatedText(
+                                        "Cooking the Answer...",
+                                        cursor: '|',
+                                        speed:
+                                            const Duration(milliseconds: 100)),
+                                  ][textAnimationIndex]
+                                ],
+                                repeatForever: true,
+                                isRepeatingAnimation: true,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
