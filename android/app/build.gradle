@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.werewolfstudiios.instasolve.insta_solve"
+    namespace "com.werewolfstudiios.instasolve"
     compileSdk 34
     ndkVersion flutter.ndkVersion
 
