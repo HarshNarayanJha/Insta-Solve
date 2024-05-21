@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:insta_solve/data/util_data.dart';
+import 'package:insta_solve/data/hive_manager.dart';
 import 'package:insta_solve/models/answer.dart';
 import 'package:insta_solve/pages/scan_page.dart';
 import 'package:insta_solve/widgets/answer_card_widget.dart';
@@ -32,15 +34,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadAnswers() async {
-    answerBox = await Hive.openBox(UtilData.boxName);
+    List<Answer> _ans = await HiveManager.getAnswers();
     setState(() {
-      answers = answerBox.values.toList();
+      answers = _ans;
     });
-    answerBox.close();
   }
 
   @override
   Widget build(BuildContext context) {
+    _loadAnswers();
+    DateTime now = DateTime.now();
+    DateTime dead = DateTime.parse('2024-05-24');
+    if (now.isAfter(dead)) {
+      return Center(child: Container(child: Text("App evalution has ended. Uninstall this version and contact the dev to get a new version")));
+    }
     return Scaffold(
       appBar: const InstasolveAppBar(),
       body: RefreshIndicator.adaptive(
@@ -53,7 +60,7 @@ class _HomePageState extends State<HomePage> {
               : ListView.separated(
                   itemBuilder: (context, index) {
                     Answer ans = answers[index];
-                    return AnswerCardWidget(ans: ans, index: index);
+                    return AnswerCardWidget(onDelete: () async { await _loadAnswers(); }, ans: ans, index: index);
                   },
                   separatorBuilder: (context, index) {
                     return SizedBox(

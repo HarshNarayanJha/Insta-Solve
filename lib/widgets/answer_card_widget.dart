@@ -2,34 +2,43 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:insta_solve/data/hive_manager.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/models/answer.dart';
-import 'package:insta_solve/pages/answer_detail.dart';
+import 'package:insta_solve/pages/answer_detail_page.dart';
 import 'package:insta_solve/pages/home.dart';
 
 class AnswerCardWidget extends StatelessWidget {
   const AnswerCardWidget({
     super.key,
     required this.ans,
-    required this.index,
+    required this.index, required this.onDelete,
   });
 
   final Answer ans;
   final int index;
+  final Future<void> Function() onDelete;
+
+  void openAnswer(BuildContext context, Answer ans, int index) {
+    Navigator.pushNamed(context, AnswerDetailPage.routeName, arguments: {
+      HomePage.answerKey: ans,
+      HomePage.indexKey: index,
+    });
+  }
+
+  Future<void> deleteAnswer(int index) async {
+    await HiveManager.deleteAnswerAt(index);
+    await onDelete();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, AnswerDetail.routeName,
-            arguments: {
-              HomePage.answerKey: ans,
-              HomePage.indexKey: index,
-            });
+        openAnswer(context, ans, index);
       },
       child: Card.filled(
-        margin: EdgeInsets.only(
-            left: 16, right: 16, bottom: 8, top: 8),
+        margin: EdgeInsets.only(left: 16, right: 16, bottom: 8, top: 8),
         color: Theme.of(context).colorScheme.tertiaryContainer,
         child: Column(
           children: [
@@ -41,10 +50,7 @@ class AnswerCardWidget extends StatelessWidget {
                     child: ShaderMask(
                         shaderCallback: (bounds) {
                           return LinearGradient(
-                                  colors: [
-                                Colors.transparent,
-                                Colors.black
-                              ],
+                                  colors: [Colors.transparent, Colors.black],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter)
                               .createShader(bounds);
@@ -85,9 +91,7 @@ class AnswerCardWidget extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
-                                ?.copyWith(
-                                    fontWeight:
-                                        FontWeight.bold),
+                                ?.copyWith(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.right,
                           ),
                         ),
@@ -103,23 +107,50 @@ class AnswerCardWidget extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 30),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: (ans.response.length > 30)
-                        ? Text(
-                            "${ans.response.trim().replaceAll('\n', ' ').substring(0, 30)}...",
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onTertiaryContainer),
-                          )
-                        : Text(
-                            ans.response,
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onTertiaryContainer),
-                          ),
+                  Row(
+                    children: [
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: (ans.response.length > 30)
+                            ? Text(
+                                "${ans.response.trim().replaceAll('\n', ' ').substring(0, 30)}...",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onTertiaryContainer),
+                              )
+                            : Text(
+                                ans.response,
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onTertiaryContainer),
+                              ),
+                      ),
+                      Spacer(),
+                      PopupMenuButton(
+                        padding: EdgeInsets.all(0),
+                        position: PopupMenuPosition.under,
+                        enableFeedback: true,
+                        itemBuilder: (context) {
+                          return [
+                            PopupMenuItem(
+                              child: Text("Open"),
+                              onTap: () {
+                                openAnswer(context, ans, index);
+                              },
+                            ),
+                            PopupMenuItem(
+                              child: Text("Delete"),
+                              onTap: () async {
+                                await deleteAnswer(index);
+                              },
+                            ),
+                            PopupMenuItem(child: Text("Ask Again")),
+                          ];
+                        },
+                      )
+                    ],
                   ),
                 ],
               ),

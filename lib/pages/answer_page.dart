@@ -1,24 +1,21 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:insta_solve/data/hive_manager.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/env/env.dart';
-import 'package:insta_solve/models/answer.dart';
 import 'package:insta_solve/pages/scan_page.dart';
 import 'package:insta_solve/widgets/answer_view_widget.dart';
 import 'package:insta_solve/widgets/image_frame.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 import 'package:insta_solve/widgets/no_connection_widget.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
 
 class AnswerPage extends StatefulWidget {
   const AnswerPage({super.key});
@@ -35,6 +32,8 @@ class _AnswerPageState extends State<AnswerPage> {
 
   late final ScrollController pageScrollController;
   bool fabVisible = false;
+  bool answerSaved = false;
+  int answerKey = -1;
 
   final textAnimationIndex = Random().nextInt(2);
 
@@ -53,23 +52,23 @@ class _AnswerPageState extends State<AnswerPage> {
     super.initState();
 
     pageScrollController = ScrollController();
-    pageScrollController.addListener(() {
-      if (responseText.isEmpty) return;
+    // pageScrollController.addListener(() {
+    //   if (responseText.isEmpty) return;
 
-      if (pageScrollController.position.atEdge) {
-        if (fabVisible == false) {
-          setState(() {
-            fabVisible = true;
-          });
-        }
-      } else {
-        if (fabVisible == true) {
-          setState(() {
-            fabVisible = false;
-          });
-        }
-      }
-    });
+    //   if (pageScrollController.position.userScrollDirection == ScrollDirection.idle) {
+    //     if (fabVisible == false) {
+    //       setState(() {
+    //         fabVisible = true;
+    //       });
+    //     }
+    //   } else {
+    //     if (fabVisible == true) {
+    //       setState(() {
+    //         fabVisible = false;
+    //       });
+    //     }
+    //   }
+    // });
 
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
@@ -149,51 +148,21 @@ class _AnswerPageState extends State<AnswerPage> {
     setState(() {
       if (response.text != null) {
         responseText = response.text!;
+        fabVisible = true;
       }
     });
   }
 
-  Future<void> _saveAnswer(XFile? img, String grade, String userPrompt, Prompt subject, String response) async {
-    final Directory? saveDir = await getExternalStorageDirectory();
-    File tmpFile;
-    File saveImg;
-    
-    late final Answer answer;
-    if (img != null) {
-      tmpFile = File(img.path);
-      final String fileName = basename(tmpFile.path);
-      print("File to copy, $tmpFile");
-      print("File copy to, " + '$saveDir/$fileName');
-    
-      saveImg = await tmpFile.copy('${saveDir!.path}/$fileName');
-    
-      print("File copied to, $saveImg");
-    
-      // create answer instance
-      answer = Answer(
-          imagePath: tmpFile.path,
-          grade: grade,
-          prompt: userPrompt,
-          subject: subject.name,
-          response: responseText );
-    } else {
-      answer = Answer(
-          grade: grade,
-          prompt: userPrompt,
-          subject: subject.name,
-          response: responseText);
+  Future<void> _saveAnswer(XFile? img, String grade, String userPrompt,
+      Prompt subject, String response) async {
+    if (answerSaved) {
+      return;
     }
-    
-    print("Saving ${answer.prompt}");
-    
-    // save the answer to disk
-    var answerBox = await Hive.openBox<Answer>(UtilData.boxName);
-    answerBox.add(answer);
-    
-    print("Saved Answer");
-    
-    // close the box
-    await answerBox.close();
+
+    int key =
+        await HiveManager.saveAnswer(img, grade, userPrompt, subject, response);
+    answerKey = key;
+    answerSaved = true;
   }
 
   @override
@@ -221,7 +190,7 @@ class _AnswerPageState extends State<AnswerPage> {
       getResponse(file, promptText, subject, grade);
       apiCalled = true;
     }
-
+    
     double w = MediaQuery.of(context).size.width;
     // double h = MediaQuery.of(context).size.height;
 
@@ -334,6 +303,33 @@ class _AnswerPageState extends State<AnswerPage> {
           tooltip: "Save the Answer for later reference",
           onPressed: () async {
             // save the image to the disk
+            if (answerSaved) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text("Already Saved!!"),
+                action: SnackBarAction(
+                    label: "Delete",
+                    onPressed: () async {
+                      await HiveManager.deleteAnswer(answerKey);
+                      answerSaved = false;
+                    }),
+              ));
+              return;
+            }
+
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text("Saved to Home Screen!!"),
+              action: SnackBarAction(
+                  label: "Delete",
+                  onPressed: () async {
+                    await HiveManager.deleteAnswer(answerKey);
+                    answerSaved = false;
+                  }),
+            ));
+
             await _saveAnswer(file, grade, promptText, subject, responseText);
           },
           label: const Text("Save Answer"),
