@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:insta_solve/data/util_data.dart';
+import 'package:insta_solve/models/answer.dart';
+import 'package:insta_solve/pages/answer_detail.dart';
 import 'package:insta_solve/pages/answer_page.dart';
 import 'package:insta_solve/pages/home.dart';
 import 'package:insta_solve/pages/scan_page.dart';
 import 'package:insta_solve/theme/theme.dart';
 import 'package:insta_solve/theme/util.dart';
 
-void main() {
+void main() async {
+
+  // init hive
+  await Hive.initFlutter();
+  // register the adapter
+  Hive.registerAdapter(AnswerAdapter());
+  // open a box
+  await Hive.openBox<Answer>(UtilData.boxName);
+
   runApp(const MyApp());
 }
 
@@ -26,10 +39,12 @@ class MyApp extends StatelessWidget {
       theme: brightness == Brightness.light ? theme.light() : theme.dark(),
       
       home: const HomePage(),
+      initialRoute: HomePage.routeName,
       routes: {
         HomePage.routeName: (context) => const HomePage(),
         ScanPage.routeName: (context) => const ScanPage(),
         AnswerPage.routeName: (context) => const AnswerPage(),
+        AnswerDetail.routeName: (context) => const AnswerDetail(),
       },
     );
   }

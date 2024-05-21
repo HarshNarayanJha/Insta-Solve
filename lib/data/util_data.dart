@@ -69,6 +69,9 @@ class UtilData {
     Prompt.hindi,
     Prompt.bio
   ];
+
+  static const String boxName = 'questionAnswers';
+  // static const String answersKey = 'answers';
 }
 
 extension ToTile on String {
