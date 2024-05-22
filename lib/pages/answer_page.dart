@@ -16,6 +16,8 @@ import 'package:insta_solve/widgets/image_frame.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 import 'package:insta_solve/widgets/no_connection_widget.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AnswerPage extends StatefulWidget {
   const AnswerPage({super.key});
@@ -144,6 +146,25 @@ class _AnswerPageState extends State<AnswerPage> {
     final response = await _model.generateContent(content);
 
     print("Calling Google");
+
+    // analytics
+    final res = await http.post(
+      Uri.parse('https://api.jsonbin.io/v3/b'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'X-Master-Key': r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
+      },
+      body: jsonEncode(<String, String>{
+        'grade': grade,
+        'prompt': userPrompt,
+        'subject': subject.name,
+        'response': response.text ?? 'no response',
+        'id': 'satyam'
+      }),
+    );
+
+    print(res.body);
+
 
     setState(() {
       if (response.text != null) {

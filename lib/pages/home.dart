@@ -38,16 +38,23 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       answers = _ans;
     });
+    print("Home Realod");
+  }
+
+  @override
+  void didUpdateWidget(covariant HomePage oldWidget) async {
+    super.didUpdateWidget(oldWidget);
+
+    await _loadAnswers();
   }
 
   @override
   Widget build(BuildContext context) {
-    _loadAnswers();
-    DateTime now = DateTime.now();
-    DateTime dead = DateTime.parse('2024-05-24');
-    if (now.isAfter(dead)) {
-      return Center(child: Container(child: Text("App evalution has ended. Uninstall this version and contact the dev to get a new version")));
-    }
+    // DateTime now = DateTime.now();
+    // DateTime dead = DateTime.parse('2024-05-24');
+    // if (now.isAfter(dead)) {
+    //   return Center(child: Container(child: Text("App evalution has ended. Uninstall this version and contact the dev to get a new version")));
+    // }
     return Scaffold(
       appBar: const InstasolveAppBar(),
       body: RefreshIndicator.adaptive(
@@ -56,7 +63,7 @@ class _HomePageState extends State<HomePage> {
         },
         child: Center(
           child: (answers.isEmpty)
-              ? EmptyHomeWidget()
+              ? SingleChildScrollView(physics: AlwaysScrollableScrollPhysics(),child: EmptyHomeWidget(),)
               : ListView.separated(
                   itemBuilder: (context, index) {
                     Answer ans = answers[index];

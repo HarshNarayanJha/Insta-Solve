@@ -1,4 +1,6 @@
+import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +13,8 @@ class HiveManager {
   static Future<List<Answer>> getAnswers() async {
     Box<Answer> answerBox = await Hive.openBox<Answer>(UtilData.boxName);
     List<Answer> answers = answerBox.values.toList();
+    print("Reading all Answers");
+    print(answers);
     await answerBox.close();
     return answers;
   }
@@ -18,23 +22,24 @@ class HiveManager {
   static Future<int> saveAnswer(XFile? img, String grade, String userPrompt,
       Prompt subject, String response) async {
     final Directory? saveDir = await getExternalStorageDirectory();
-    File tmpFile;
+    Uint8List data;
     File saveImg;
 
     late final Answer answer;
     if (img != null) {
-      tmpFile = File(img.path);
-      final String fileName = basename(tmpFile.path);
-      print("File to copy, $tmpFile");
+      data = await img.readAsBytes();
+      final String fileName = basename(img.path);
+      print("File to copy, $img");
       print("File copy to, " + '$saveDir/$fileName');
 
-      saveImg = await tmpFile.copy('${saveDir!.path}/$fileName');
+      saveImg = await File('${saveDir!.path}/$fileName').create();
+      await saveImg.writeAsBytes(data);
 
       print("File copied to, $saveImg");
 
       // create answer instance
       answer = Answer(
-          imagePath: tmpFile.path,
+          imagePath: saveImg.path,
           grade: grade,
           prompt: userPrompt,
           subject: subject.name,
