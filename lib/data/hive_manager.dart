@@ -1,4 +1,4 @@
-import 'dart:ffi';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -13,8 +13,8 @@ class HiveManager {
   static Future<List<Answer>> getAnswers() async {
     Box<Answer> answerBox = await Hive.openBox<Answer>(UtilData.boxName);
     List<Answer> answers = answerBox.values.toList();
-    print("Reading all Answers");
-    print(answers);
+    log("Reading all Answers");
+    log(answers.toString());
     await answerBox.close();
     return answers;
   }
@@ -29,13 +29,13 @@ class HiveManager {
     if (img != null) {
       data = await img.readAsBytes();
       final String fileName = basename(img.path);
-      print("File to copy, $img");
-      print("File copy to, " + '$saveDir/$fileName');
+      log("File to copy, $img");
+      log("File copy to, $saveDir/$fileName");
 
       saveImg = await File('${saveDir!.path}/$fileName').create();
       await saveImg.writeAsBytes(data);
 
-      print("File copied to, $saveImg");
+      log("File copied to, $saveImg");
 
       // create answer instance
       answer = Answer(
@@ -52,13 +52,13 @@ class HiveManager {
           response: response);
     }
 
-    print("Saving ${answer.prompt}");
+    log("Saving ${answer.prompt}");
 
     // save the answer to disk
     var answerBox = await Hive.openBox<Answer>(UtilData.boxName);
     int index = await answerBox.add(answer);
 
-    print("Saved Answer");
+    log("Saved Answer");
 
     // close the box
     await answerBox.close();
@@ -68,7 +68,7 @@ class HiveManager {
 
   static Future<void> deleteAnswerAt(int index) async {
     final answerBox = await Hive.openBox(UtilData.boxName);
-    print("Delete answer at $index");
+    log("Delete answer at $index");
     await answerBox.deleteAt(index);
     await answerBox.close();
   }
@@ -78,10 +78,10 @@ class HiveManager {
     Answer ans = await answerBox.get(key);
     if (ans.imagePath != null) {
       await File(ans.imagePath!).delete();
-      print("Delete image at ${ans.imagePath!}");
+      log("Delete image at ${ans.imagePath!}");
     }
     await answerBox.delete(key);
-    print("Delete answer using key $key");
+    log("Delete answer using key $key");
     await answerBox.close();
   }
 }

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:developer' as dev;
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,8 +16,6 @@ import 'package:insta_solve/widgets/image_frame.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 import 'package:insta_solve/widgets/no_connection_widget.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class AnswerPage extends StatefulWidget {
   const AnswerPage({super.key});
@@ -30,7 +28,7 @@ class AnswerPage extends StatefulWidget {
 
 class _AnswerPageState extends State<AnswerPage> {
   final TeXViewRenderingEngine renderingEngine =
-      const TeXViewRenderingEngine.mathjax();
+      const TeXViewRenderingEngine.katex();
 
   late final ScrollController pageScrollController;
   bool fabVisible = false;
@@ -54,23 +52,6 @@ class _AnswerPageState extends State<AnswerPage> {
     super.initState();
 
     pageScrollController = ScrollController();
-    // pageScrollController.addListener(() {
-    //   if (responseText.isEmpty) return;
-
-    //   if (pageScrollController.position.userScrollDirection == ScrollDirection.idle) {
-    //     if (fabVisible == false) {
-    //       setState(() {
-    //         fabVisible = true;
-    //       });
-    //     }
-    //   } else {
-    //     if (fabVisible == true) {
-    //       setState(() {
-    //         fabVisible = false;
-    //       });
-    //     }
-    //   }
-    // });
 
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
@@ -90,8 +71,9 @@ class _AnswerPageState extends State<AnswerPage> {
       topP: 1,
       maxOutputTokens: 1024,
     );
+
     _model = GenerativeModel(
-        model: 'gemini-1.5-pro-latest',
+        model: 'gemini-1.5-flash',
         apiKey: Env.apiKey,
         generationConfig: generationConfig);
   }
@@ -142,36 +124,44 @@ class _AnswerPageState extends State<AnswerPage> {
       content.add(Content.text(userPrompt));
     }
 
-    // final response = _model.generateContentStream(content);
-    final response = await _model.generateContent(content);
+    for (var c in content) {
+      print(c.toJson());
+    }
 
-    print("Calling Google");
+    try {
+      final response = await _model.generateContent(content);
+      dev.log("Calling Google ${response.text}");
+
+      setState(() {
+        if (response.text != null) {
+          responseText = response.text!;
+          fabVisible = true;
+        } else {
+          responseText = "Error fetching Answer";
+        }
+      });
+    } catch (e) {
+      setState(() {
+        responseText = e.toString();
+      });
+    }
+    // final response = _model.generateContentStream(content);
 
     // analytics
-    final res = await http.post(
-      Uri.parse('https://api.jsonbin.io/v3/b'),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-        'X-Master-Key': r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
-      },
-      body: jsonEncode(<String, String>{
-        'grade': grade,
-        'prompt': userPrompt,
-        'subject': subject.name,
-        'response': response.text ?? 'no response',
-        'id': 'satyam'
-      }),
-    );
-
-    print(res.body);
-
-
-    setState(() {
-      if (response.text != null) {
-        responseText = response.text!;
-        fabVisible = true;
-      }
-    });
+    // final res = await http.post(
+    //   Uri.parse('https://api.jsonbin.io/v3/b'),
+    //   headers: <String, String>{
+    //     'Content-Type': 'application/json',
+    //     'X-Master-Key': r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
+    //   },
+    //   body: jsonEncode(<String, String>{
+    //     'grade': grade,
+    //     'prompt': userPrompt,
+    //     'subject': subject.name,
+    //     'response': response.text ?? 'no response',
+    //     'id': 'satyam'
+    //   }),
+    // );
   }
 
   Future<void> _saveAnswer(XFile? img, String grade, String userPrompt,
@@ -211,9 +201,8 @@ class _AnswerPageState extends State<AnswerPage> {
       getResponse(file, promptText, subject, grade);
       apiCalled = true;
     }
-    
+
     double w = MediaQuery.of(context).size.width;
-    // double h = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: const InstasolveAppBar(),
@@ -328,7 +317,7 @@ class _AnswerPageState extends State<AnswerPage> {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 behavior: SnackBarBehavior.floating,
-                content: Text("Already Saved!!"),
+                content: const Text("Already Saved!!"),
                 action: SnackBarAction(
                     label: "Delete",
                     onPressed: () async {
@@ -342,7 +331,7 @@ class _AnswerPageState extends State<AnswerPage> {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               behavior: SnackBarBehavior.floating,
-              content: Text("Saved to Home Screen!!"),
+              content: const Text("Saved to Library!!"),
               action: SnackBarAction(
                   label: "Delete",
                   onPressed: () async {

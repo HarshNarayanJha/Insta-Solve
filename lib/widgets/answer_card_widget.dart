@@ -7,17 +7,25 @@ import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/models/answer.dart';
 import 'package:insta_solve/pages/answer_detail_page.dart';
 import 'package:insta_solve/pages/home.dart';
+import 'package:insta_solve/pages/scan_page.dart';
 
 class AnswerCardWidget extends StatelessWidget {
   const AnswerCardWidget({
     super.key,
     required this.ans,
-    required this.index, required this.onDelete,
+    required this.index,
+    required this.onDelete,
+    // required this.onAskAgain,
   });
 
   final Answer ans;
   final int index;
   final Future<void> Function() onDelete;
+
+  static const String imageKey = 'image';
+  static const String customPromptKey = 'custom';
+  static const String subjectKey = 'subject';
+  static const String gradeKey = 'grade';
 
   void openAnswer(BuildContext context, Answer ans, int index) {
     Navigator.pushNamed(context, AnswerDetailPage.routeName, arguments: {
@@ -146,7 +154,18 @@ class AnswerCardWidget extends StatelessWidget {
                                 await deleteAnswer(index);
                               },
                             ),
-                            PopupMenuItem(child: Text("Ask Again")),
+                            PopupMenuItem(
+                              child: Text("Ask Again"),
+                              onTap: () {
+                                Navigator.of(context)
+                                    .pushNamed(ScanPage.routeName, arguments: {
+                                  AnswerCardWidget.imageKey: ans.imagePath,
+                                  AnswerCardWidget.customPromptKey: ans.prompt,
+                                  AnswerCardWidget.subjectKey: ans.subject,
+                                  AnswerCardWidget.gradeKey: ans.grade
+                                });
+                              },
+                            ),
                           ];
                         },
                       )

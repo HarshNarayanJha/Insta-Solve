@@ -1,16 +1,18 @@
+import 'dart:developer';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:insta_solve/data/hive_manager.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/pages/answer_page.dart';
+import 'package:insta_solve/widgets/answer_card_widget.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
+import 'package:insta_solve/widgets/responsive.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ScanPage extends StatefulWidget {
-
   const ScanPage({super.key});
 
   static const routeName = '/scan';
@@ -30,6 +32,9 @@ class _ScanPageState extends State<ScanPage> {
   String gradeValue = UtilData.grades[9];
   TextEditingController customInput = TextEditingController();
   bool imageOverlayVisible = false;
+
+  bool askedAgainSetDone = false;
+  bool answerSavedForLater = false;
 
   @override
   void initState() {
@@ -58,18 +63,29 @@ class _ScanPageState extends State<ScanPage> {
       ImageCropper cropper = ImageCropper();
       final croppedImage = await cropper.cropImage(
         sourcePath: image.path,
-        aspectRatioPresets: [
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio16x9,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio3x2,
-        ],
         uiSettings: [
           AndroidUiSettings(
-              toolbarTitle: "Cropping One Question", lockAspectRatio: false),
+            toolbarTitle: "Cropping Question Image",
+            lockAspectRatio: false,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio16x9,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio3x2,
+            ],
+          ),
           IOSUiSettings(
-              title: "Cropping One Question", aspectRatioLockEnabled: false),
+            title: "Cropping Question Image",
+            aspectRatioLockEnabled: false,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio16x9,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio3x2,
+            ],
+          ),
         ],
       );
       setState(() {
@@ -82,16 +98,16 @@ class _ScanPageState extends State<ScanPage> {
     final ImagePicker picker = ImagePicker();
     final LostDataResponse response = await picker.retrieveLostData();
     if (response.isEmpty) {
-      print("No lost File found");
+      log("No lost File found");
       return;
     }
     final List<XFile>? files = response.files;
     if (files != null) {
-      print("Lost files $files");
+      log("Lost files $files");
       setState(() {
         _image = files.first;
       });
-      print(_image?.path ?? 'no path');
+      log(_image?.path ?? 'no path');
     }
   }
 
@@ -108,10 +124,52 @@ class _ScanPageState extends State<ScanPage> {
     });
   }
 
+  Future<void> toAnswer() async {
+    // ignore: use_build_context_synchronously
+    Navigator.pushNamed(context, AnswerPage.routeName, arguments: {
+      ScanPage.imageKey: _image,
+      ScanPage.promptKey: customInput.text,
+      ScanPage.gradeKey: gradeValue,
+      ScanPage.subjectKey: subject,
+      ScanPage.connectionKey: await InternetConnection().hasInternetAccess,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final arguments = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
+
+    if (!askedAgainSetDone) {
+      if (arguments.containsKey(AnswerCardWidget.imageKey) &&
+          arguments[AnswerCardWidget.imageKey] != null) {
+        setState(() {
+          _image = XFile(arguments[AnswerCardWidget.imageKey]);
+          askedAgainSetDone = true;
+        });
+      }
+      if (arguments.containsKey(AnswerCardWidget.customPromptKey)) {
+        setState(() {
+          customInput.text = arguments[AnswerCardWidget.customPromptKey];
+          askedAgainSetDone = true;
+        });
+      }
+      if (arguments.containsKey(AnswerCardWidget.subjectKey)) {
+        setState(() {
+          subject = Prompt.values.firstWhere(
+              (p) => p.name == arguments[AnswerCardWidget.subjectKey]);
+          askedAgainSetDone = true;
+        });
+      }
+      if (arguments.containsKey(AnswerCardWidget.gradeKey)) {
+        setState(() {
+          gradeValue = arguments[AnswerCardWidget.gradeKey];
+          askedAgainSetDone = true;
+        });
+      }
+    }
+
     double w = MediaQuery.of(context).size.width;
-    // double h = MediaQuery.of(context).size.height;
 
     bool gotData = customInput.text.isNotEmpty || (_image != null);
 
@@ -122,231 +180,273 @@ class _ScanPageState extends State<ScanPage> {
         scrollDirection: Axis.vertical,
         physics: (Platform.isLinux)
             ? const PageScrollPhysics()
-            : const BouncingScrollPhysics(),
-        child: Container(
-          constraints: const BoxConstraints.tightForFinite(),
-          width: w,
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-              Text(
-                "Choose either Image or Image with prompt or only Prompt.",
-                style: Theme.of(context).textTheme.labelMedium,
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                "NOTE: if the app closes after taking a photo, reopen this screen to get the photo back",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: Colors.grey.shade600),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 30),
-              Stack(
-                // alignment: Alignment.center,
-                children: [
-                  if (_image == null)
-                    ImageFiltered(
-                      imageFilter: ImageFilter.blur(
-                          sigmaX: 5.0, sigmaY: 5.0, tileMode: TileMode.decal),
-                      child: Container(
+            : const BouncingScrollPhysics(
+                decelerationRate: ScrollDecelerationRate.fast),
+        child: Responsive(
+          child: Container(
+            width: w,
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                Text(
+                  "Choose either Image or Image with prompt or only Prompt.",
+                  style: Theme.of(context).textTheme.labelMedium,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "NOTE: if the app closes after taking a photo, reopen this screen to get the photo back",
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelMedium
+                      ?.copyWith(color: Colors.grey.shade600),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                Stack(
+                  children: [
+                    if (_image == null)
+                      Container(
+                        width: 300,
+                        height: 300,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey.shade800),
+                      )
+                    else
+                      Container(
                         width: 300,
                         height: 300,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             color: Colors.grey.shade800),
                       ),
-                    )
-                  else
-                    Container(
+                    SizedBox(
                       width: 300,
                       height: 300,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey.shade800),
+                      child: (_image == null)
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    _openGallery();
+                                  },
+                                  icon: const Icon(
+                                    Icons.photo,
+                                    size: 48,
+                                  ),
+                                  color: Colors.white,
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    _openCamera();
+                                  },
+                                  icon: const Icon(
+                                    Icons.camera_alt,
+                                    size: 48,
+                                  ),
+                                  color: Colors.white,
+                                ),
+                              ],
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Stack(children: [
+                                GestureDetector(
+                                    onTap: () {
+                                      _toggleImageOverlay();
+                                    },
+                                    child: Center(
+                                        child: Image.file(File(_image!.path)))),
+                                AnimatedOpacity(
+                                  opacity: imageOverlayVisible ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 250),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _toggleImageOverlay();
+                                    },
+                                    child: Container(
+                                        height: 300,
+                                        width: 300,
+                                        decoration: BoxDecoration(
+                                            color:
+                                                Colors.black.withOpacity(0.6)),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _removeImage();
+                                          },
+                                          child: const Icon(
+                                            Icons.delete_forever_outlined,
+                                            color: Colors.red,
+                                            semanticLabel: "Close Image",
+                                            size: 72,
+                                          ),
+                                        )),
+                                  ),
+                                ),
+                              ]),
+                            ),
                     ),
-                  SizedBox(
-                    width: 300,
-                    height: 300,
-                    child: (_image == null)
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  _openGallery();
-                                },
-                                icon: const Icon(
-                                  Icons.photo,
-                                  size: 48,
-                                ),
-                                color: Colors.white,
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  _openCamera();
-                                },
-                                icon: const Icon(
-                                  Icons.camera_alt,
-                                  size: 48,
-                                ),
-                                color: Colors.white,
-                              ),
-                            ],
-                          )
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Stack(children: [
-                              GestureDetector(
-                                  onTap: () {
-                                    _toggleImageOverlay();
-                                  },
-                                  child: Center(
-                                      child: Image.file(File(_image!.path)))),
-                              AnimatedOpacity(
-                                opacity: imageOverlayVisible ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 250),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _toggleImageOverlay();
-                                  },
-                                  child: Container(
-                                      height: 300,
-                                      width: 300,
-                                      decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.6)),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          _removeImage();
-                                        },
-                                        child: const Icon(
-                                          Icons.delete_forever_outlined,
-                                          color: Colors.red,
-                                          semanticLabel: "Close Image",
-                                          size: 72,
-                                        ),
-                                      )),
-                                ),
-                              ),
-                            ]),
+                  ],
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: SizedBox(
+                    width: 350,
+                    child: TextField(
+                      controller: customInput,
+                      onChanged: (String value) {
+                        setState(() {
+                          gotData =
+                              customInput.text.isNotEmpty || (_image != null);
+                        });
+                      },
+                      maxLength: 60,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(16),
+                        label: const Text("Custom Instructions"),
+                        suffixIcon: AnimatedOpacity(
+                          duration: Durations.short3,
+                          opacity: customInput.text.isEmpty ? 0.0 : 1.0,
+                          child: GestureDetector(
+                            child: const Icon(Icons.clear_rounded),
+                            onTap: () {
+                              setState(() {
+                                customInput.clear();
+                              });
+                            },
                           ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(
-                height: 40,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: SizedBox(
-                  width: 350,
-                  child: TextField(
-                    controller: customInput,
-                    onChanged: (String value) {
-                      setState(() {
-                        gotData =
-                            customInput.text.isNotEmpty || (_image != null);
-                      });
-                    },
-                    maxLength: 60,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(16),
-                      label: const Text("Custom Prompt"),
-                      helperText: "solve 5th question.. answer in points.. etc",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
+                        ),
+                        helperText:
+                            "Solve 5th question.. answer in points.. etc",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
-                      // hintText: "..solve 5th question OR answer in points"
                     ),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 40),
-              DropdownMenu<String>(
-                width: 350,
-                label: const Text("Question's subject"),
-                menuHeight: 600,
-                leadingIcon: const Icon(Icons.subject_outlined),
-                initialSelection: subject.name,
-                helperText:
-                    "finetune the question based on subject\nsometimes 'Generic' may provide better solutions",
-                onSelected: (String? value) {
-                  setState(() {
-                    subject = Prompt.values.firstWhere((e) => e.name == value!);
-                  });
-                },
-                dropdownMenuEntries: UtilData.qtypes
-                    .map<DropdownMenuEntry<String>>((Prompt val) {
-                  return DropdownMenuEntry<String>(
-                      value: val.name, label: val.name.toTitleCase());
-                }).toList(),
-              ),
-
-              const SizedBox(height: 40),
-
-              DropdownMenu<String>(
-                width: 350,
-                label: const Text("Question's Grade level"),
-                menuHeight: 400,
-                leadingIcon: const Icon(Icons.class_outlined),
-                initialSelection: gradeValue,
-                helperText:
-                    "question's grade level\nset to no grade to auto determine",
-                onSelected: (String? value) {
-                  setState(() {
-                    gradeValue = value!;
-                  });
-                },
-                dropdownMenuEntries: UtilData.grades
-                    .map<DropdownMenuEntry<String>>((String val) {
-                  return DropdownMenuEntry<String>(value: val, label: val);
-                }).toList(),
-              ),
-
-              const SizedBox(height: 50),
-
-              ElevatedButton.icon(
-                  icon: Icon(
-                    Icons.home_work_outlined,
-                    color: Theme.of(context).colorScheme.onTertiaryContainer,
-                  ),
-                  onPressed: (gotData)
-                      ? () async {
-                          Navigator.pushNamed(context, AnswerPage.routeName,
-                              arguments: {
-                                ScanPage.imageKey: _image,
-                                ScanPage.promptKey: customInput.text,
-                                ScanPage.gradeKey: gradeValue,
-                                ScanPage.subjectKey: subject,
-                                ScanPage.connectionKey: await InternetConnection().hasInternetAccess,
-                              });
-                        }
-                      : null,
-                  style: (gotData)
-                      ? ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(
-                              Theme.of(context).colorScheme.tertiaryContainer))
-                      : const ButtonStyle(),
-                  label: Text("Solve!",
-                      style: TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onTertiaryContainer))),
-
-              const SizedBox(height: 30),
-
-              // const Text("Scan question with your camera"),Content.text(prompt)
-              // GestureDetector(
-              //   onTap: () => Navigator.pushNamed(context, "/answer"),
-              //   child: const Text("Now view answer"),
-              // )
-            ],
+                const SizedBox(height: 40),
+                DropdownMenu<String>(
+                  width: 350,
+                  label: const Text("Question's subject"),
+                  menuHeight: 300,
+                  leadingIcon: const Icon(Icons.subject_outlined),
+                  initialSelection: subject.name,
+                  helperText:
+                      "Finetune the question based on subject\nSometimes 'Generic' may provide better solutions",
+                  onSelected: (String? value) {
+                    setState(() {
+                      subject =
+                          Prompt.values.firstWhere((e) => e.name == value!);
+                    });
+                  },
+                  dropdownMenuEntries: UtilData.qtypes
+                      .map<DropdownMenuEntry<String>>((Prompt val) {
+                    return DropdownMenuEntry<String>(
+                      value: val.name,
+                      label: val.name.toTitleCase(),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 40),
+                DropdownMenu<String>(
+                  width: 350,
+                  label: const Text("Question's Grade level"),
+                  menuHeight: 300,
+                  leadingIcon: const Icon(Icons.class_outlined),
+                  initialSelection: gradeValue,
+                  helperText:
+                      "Question's grade level\nSet to no grade to auto determine",
+                  onSelected: (String? value) {
+                    setState(() {
+                      gradeValue = value!;
+                    });
+                  },
+                  dropdownMenuEntries: UtilData.grades
+                      .map<DropdownMenuEntry<String>>((String val) {
+                    return DropdownMenuEntry<String>(value: val, label: val);
+                  }).toList(),
+                ),
+                const SizedBox(height: 50),
+                ElevatedButton.icon(
+                    icon: Icon(
+                      Icons.home_work_outlined,
+                      color: (gotData)
+                          ? Theme.of(context).colorScheme.onTertiaryContainer
+                          : Colors.grey,
+                    ),
+                    onPressed: (gotData)
+                        ? () async {
+                            await toAnswer();
+                          }
+                        : null,
+                    style: (gotData)
+                        ? ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(
+                                Theme.of(context)
+                                    .colorScheme
+                                    .tertiaryContainer))
+                        : const ButtonStyle(),
+                    label: Text("Solve!",
+                        style: TextStyle(
+                            color: (gotData)
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .onTertiaryContainer
+                                : Colors.grey))),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                    icon: Icon(
+                      Icons.save_as_rounded,
+                      color: (gotData && !answerSavedForLater)
+                          ? Theme.of(context).colorScheme.onSecondaryContainer
+                          : Colors.grey,
+                    ),
+                    onPressed: (gotData && !answerSavedForLater)
+                        ? () async {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              content: Text("Saved to Library!!"),
+                            ));
+                            setState(() {
+                              answerSavedForLater = true;
+                            });
+                            await HiveManager.saveAnswer(
+                                _image,
+                                gradeValue,
+                                customInput.text.isEmpty
+                                    ? ''
+                                    : customInput.text,
+                                subject,
+                                "Not yet Asked");
+                          }
+                        : null,
+                    style: (gotData && !answerSavedForLater)
+                        ? ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(
+                                Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer))
+                        : const ButtonStyle(),
+                    label: Text("Save to Ask Later!",
+                        style: TextStyle(
+                            color: (gotData && !answerSavedForLater)
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .onSecondaryContainer
+                                : Colors.grey))),
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),

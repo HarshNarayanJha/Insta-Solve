@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/models/answer.dart';

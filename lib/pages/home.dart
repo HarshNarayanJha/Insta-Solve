@@ -1,6 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import 'dart:io';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -10,6 +8,7 @@ import 'package:insta_solve/pages/scan_page.dart';
 import 'package:insta_solve/widgets/answer_card_widget.dart';
 import 'package:insta_solve/widgets/empty_home_widget.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
+import 'package:insta_solve/widgets/responsive.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -33,12 +32,18 @@ class _HomePageState extends State<HomePage> {
     _loadAnswers();
   }
 
+  @override
+  void activate() {
+    _loadAnswers();
+    super.activate();
+  }
+
   Future<void> _loadAnswers() async {
-    List<Answer> _ans = await HiveManager.getAnswers();
+    List<Answer> ans = await HiveManager.getAnswers();
     setState(() {
-      answers = _ans;
+      answers = ans;
     });
-    print("Home Realod");
+    log("Home Realod");
   }
 
   @override
@@ -61,26 +66,37 @@ class _HomePageState extends State<HomePage> {
         onRefresh: () async {
           await _loadAnswers();
         },
-        child: Center(
-          child: (answers.isEmpty)
-              ? SingleChildScrollView(physics: AlwaysScrollableScrollPhysics(),child: EmptyHomeWidget(),)
-              : ListView.separated(
-                  itemBuilder: (context, index) {
-                    Answer ans = answers[index];
-                    return AnswerCardWidget(onDelete: () async { await _loadAnswers(); }, ans: ans, index: index);
-                  },
-                  separatorBuilder: (context, index) {
-                    return SizedBox(
-                      height: 20,
-                    );
-                  },
-                  itemCount: answers.length),
+        child: Responsive(
+          child: Center(
+            child: (answers.isEmpty)
+                ? const SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: EmptyHomeWidget(),
+                  )
+                : ListView.separated(
+                    itemBuilder: (context, index) {
+                      Answer ans = answers[index];
+                      return AnswerCardWidget(
+                          onDelete: () async {
+                            await _loadAnswers();
+                          },
+                          ans: ans,
+                          index: index);
+                    },
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(
+                        height: 20,
+                      );
+                    },
+                    itemCount: answers.length),
+          ),
         ),
       ),
+
       floatingActionButton: FloatingActionButton.extended(
           tooltip: "Scan Picture",
-          label: Text("Scan"),
-          icon: Icon(Icons.camera_alt_rounded),
+          label: const Text("New Scan"),
+          icon: const Icon(Icons.camera_alt_rounded),
           onPressed: () {
             Navigator.pushNamed(context, ScanPage.routeName);
           }),
