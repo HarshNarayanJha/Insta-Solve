@@ -1,8 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:insta_solve/data/hive_manager.dart';
+import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/models/answer.dart';
 import 'package:insta_solve/pages/scan_page.dart';
 import 'package:insta_solve/widgets/answer_card_widget.dart';
@@ -23,34 +26,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Box<Answer> answerBox;
-  List<Answer> answers = [];
+  ScrollController controller = ScrollController();
+  bool fabVisible = true;
 
   @override
   void initState() {
-    super.initState();
-    _loadAnswers();
-  }
-
-  @override
-  void activate() {
-    _loadAnswers();
-    super.activate();
-  }
-
-  Future<void> _loadAnswers() async {
-    List<Answer> ans = await HiveManager.getAnswers();
-    setState(() {
-      answers = ans;
+    controller.addListener(() {
+      if (controller.position.userScrollDirection == ScrollDirection.reverse && fabVisible) {
+        setState(() {
+          fabVisible = false;
+        });
+      } else if (controller.position.userScrollDirection == ScrollDirection.forward && !fabVisible) {
+        setState(() {
+          fabVisible = true;
+        });
+      }
     });
-    log("Home Realod");
+    super.initState();
   }
 
   @override
-  void didUpdateWidget(covariant HomePage oldWidget) async {
-    super.didUpdateWidget(oldWidget);
-
-    await _loadAnswers();
+  void dispose() {
+    final answerBox = Hive.box<Answer>(UtilData.boxName);
+    answerBox.close();
+    log("Box closed on dispose");
+    super.dispose();
   }
 
   @override
@@ -62,45 +62,45 @@ class _HomePageState extends State<HomePage> {
     // }
     return Scaffold(
       appBar: const InstasolveAppBar(),
-      body: RefreshIndicator.adaptive(
-        onRefresh: () async {
-          await _loadAnswers();
-        },
-        child: Responsive(
-          child: Center(
-            child: (answers.isEmpty)
-                ? const SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    child: EmptyHomeWidget(),
-                  )
-                : ListView.separated(
-                    itemBuilder: (context, index) {
-                      Answer ans = answers[index];
-                      return AnswerCardWidget(
-                          onDelete: () async {
-                            await _loadAnswers();
-                          },
-                          ans: ans,
-                          index: index);
-                    },
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(
-                        height: 20,
-                      );
-                    },
-                    itemCount: answers.length),
-          ),
-        ),
-      ),
-
-      floatingActionButton: FloatingActionButton.extended(
-          tooltip: "Scan Picture",
-          label: const Text("New Scan"),
-          icon: const Icon(Icons.camera_alt_rounded),
-          onPressed: () {
-            Navigator.pushNamed(context, ScanPage.routeName);
+      body: ValueListenableBuilder(
+          valueListenable: Hive.box<Answer>(UtilData.boxName).listenable(),
+          builder: (context, box, widget) {
+            return Responsive(
+              child: Center(
+                child: (box.values.isEmpty)
+                    ? const EmptyHomeWidget()
+                    : ListView.separated(
+                        controller: controller,
+                        itemBuilder: (context, index) {
+                          Answer ans = box.values.toList()[index];
+                          return AnswerCardWidget(
+                              onDelete: () async {
+                                // await _loadAnswers();
+                              },
+                              ans: ans,
+                              index: index);
+                        },
+                        separatorBuilder: (context, index) {
+                          return const SizedBox(
+                            height: 20,
+                          );
+                        },
+                        itemCount: box.values.length),
+              ),
+            );
           }),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: AnimatedSlide(
+        duration: Durations.medium1,
+        offset: fabVisible ? Offset.zero : Offset.fromDirection(3.14 / 2, 1.5),
+        child: FloatingActionButton.extended(
+            tooltip: "Scan Picture",
+            label: const Text("New Scan"),
+            icon: const Icon(Icons.camera_alt_rounded),
+            onPressed: () {
+              Navigator.pushNamed(context, ScanPage.routeName);
+            }),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

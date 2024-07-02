@@ -11,10 +11,12 @@ import 'package:insta_solve/theme/util.dart';
 
 void main() async {
 
+  WidgetsFlutterBinding.ensureInitialized();
+
   // init hive
   await Hive.initFlutter();
   // register the adapter
-  Hive.registerAdapter(AnswerAdapter());
+  Hive.registerAdapter<Answer>(AnswerAdapter());
   // open a box
   await Hive.openBox<Answer>(UtilData.boxName);
 

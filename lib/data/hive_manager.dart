@@ -14,8 +14,8 @@ class HiveManager {
     Box<Answer> answerBox = await Hive.openBox<Answer>(UtilData.boxName);
     List<Answer> answers = answerBox.values.toList();
     log("Reading all Answers");
-    log(answers.toString());
-    await answerBox.close();
+    log(answers.length.toString());
+    // await answerBox.close();
     return answers;
   }
 
@@ -61,27 +61,32 @@ class HiveManager {
     log("Saved Answer");
 
     // close the box
-    await answerBox.close();
+    // await answerBox.close();
 
     return index;
   }
 
   static Future<void> deleteAnswerAt(int index) async {
-    final answerBox = await Hive.openBox(UtilData.boxName);
+    final answerBox = await Hive.openBox<Answer>(UtilData.boxName);
     log("Delete answer at $index");
     await answerBox.deleteAt(index);
-    await answerBox.close();
+    // await answerBox.close();
   }
 
   static Future<void> deleteAnswer(dynamic key) async {
-    final answerBox = await Hive.openBox(UtilData.boxName);
-    Answer ans = await answerBox.get(key);
+    final answerBox = await Hive.openBox<Answer>(UtilData.boxName);
+    Answer? ans = answerBox.get(key);
+    if (ans == null) {
+      log("Answer with key $key not found!");
+      return;
+    }
+    
     if (ans.imagePath != null) {
       await File(ans.imagePath!).delete();
       log("Delete image at ${ans.imagePath!}");
     }
     await answerBox.delete(key);
     log("Delete answer using key $key");
-    await answerBox.close();
+    // await answerBox.close();
   }
 }

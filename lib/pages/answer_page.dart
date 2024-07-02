@@ -28,7 +28,7 @@ class AnswerPage extends StatefulWidget {
 
 class _AnswerPageState extends State<AnswerPage> {
   final TeXViewRenderingEngine renderingEngine =
-      const TeXViewRenderingEngine.katex();
+      const TeXViewRenderingEngine.mathjax();
 
   late final ScrollController pageScrollController;
   bool fabVisible = false;
