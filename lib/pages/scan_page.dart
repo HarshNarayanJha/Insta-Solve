@@ -229,6 +229,7 @@ class _ScanPageState extends State<ScanPage> {
                                   child: Center(
                                     child: Image.file(
                                       File(_image!.path),
+                                      width: 300,
                                     ),
                                   ),
                                 ),

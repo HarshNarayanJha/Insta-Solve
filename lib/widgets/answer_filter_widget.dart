@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:insta_solve/data/util_data.dart';
 
@@ -27,12 +25,12 @@ class AnswerFilterWidget extends StatelessWidget {
       ),
       child: Column(
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.filter_alt_rounded),
-              SizedBox(width: 5),
+              const Icon(Icons.filter_alt_rounded),
+              const SizedBox(width: 5),
               Text(
                 "Filter Answers",
                 style: Theme.of(context).textTheme.labelLarge,
@@ -56,7 +54,7 @@ class AnswerFilterWidget extends StatelessWidget {
                     onFilterSubject(value!);
                   },
                   items: [
-                    DropdownMenuItem(value: 'all', child: Text('All')),
+                    const DropdownMenuItem(value: 'all', child: Text('All')),
                     ...UtilData.qtypes
                         .map<DropdownMenuItem<String>>((Prompt val) {
                       return DropdownMenuItem<String>(
@@ -69,12 +67,12 @@ class AnswerFilterWidget extends StatelessWidget {
               DropdownButton<String>(
                 menuMaxHeight: 250,
                 value: filterClass,
-                icon: Icon(Icons.class_rounded),
+                icon: const Icon(Icons.class_rounded),
                 onChanged: (String? value) {
                   onFilterClass(value!);
                 },
                 items: [
-                  DropdownMenuItem(value: 'all', child: Text('All')),
+                  const DropdownMenuItem(value: 'all', child: Text('All')),
                   ...UtilData.grades
                       .map<DropdownMenuItem<String>>((String val) {
                     return DropdownMenuItem<String>(
@@ -86,7 +84,7 @@ class AnswerFilterWidget extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );

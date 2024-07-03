@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'dart:math';
 import 'dart:developer' as dev;
 
@@ -124,10 +126,6 @@ class _AnswerPageState extends State<AnswerPage> {
       content.add(Content.text(userPrompt));
     }
 
-    for (var c in content) {
-      print(c.toJson());
-    }
-
     try {
       final response = await _model.generateContent(content);
       dev.log("Calling Google ${response.text}");
@@ -146,22 +144,6 @@ class _AnswerPageState extends State<AnswerPage> {
       });
     }
     // final response = _model.generateContentStream(content);
-
-    // analytics
-    // final res = await http.post(
-    //   Uri.parse('https://api.jsonbin.io/v3/b'),
-    //   headers: <String, String>{
-    //     'Content-Type': 'application/json',
-    //     'X-Master-Key': r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
-    //   },
-    //   body: jsonEncode(<String, String>{
-    //     'grade': grade,
-    //     'prompt': userPrompt,
-    //     'subject': subject.name,
-    //     'response': response.text ?? 'no response',
-    //     'id': 'satyam'
-    //   }),
-    // );
   }
 
   Future<void> _saveAnswer(XFile? img, String grade, String userPrompt,
@@ -244,7 +226,7 @@ class _AnswerPageState extends State<AnswerPage> {
                               .copyWith(color: Colors.grey)),
                     ),
               const SizedBox(height: 20),
-              Divider(),
+              const Divider(),
               const SizedBox(height: 20),
               if (_connectionStatus == InternetStatus.connected ||
                   responseText.isNotEmpty)

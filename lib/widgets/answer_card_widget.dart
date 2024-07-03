@@ -124,25 +124,25 @@ class AnswerCardWidget extends StatelessWidget {
 
   PopupMenuButton<dynamic> buildPopupMenu() {
     return PopupMenuButton(
-      padding: EdgeInsets.all(0),
+      padding: const EdgeInsets.all(0),
       position: PopupMenuPosition.under,
       enableFeedback: true,
       itemBuilder: (context) {
         return [
           PopupMenuItem(
-            child: Text("Open"),
+            child: const Text("Open"),
             onTap: () {
               openAnswer(context, ans, index);
             },
           ),
           PopupMenuItem(
-            child: Text("Delete"),
+            child: const Text("Delete"),
             onTap: () async {
               await deleteAnswer(index);
             },
           ),
           PopupMenuItem(
-            child: Text("Ask Again"),
+            child: const Text("Ask Again"),
             onTap: () {
               Navigator.of(context).pushNamed(ScanPage.routeName, arguments: {
                 AnswerCardWidget.imageKey: ans.imagePath,
