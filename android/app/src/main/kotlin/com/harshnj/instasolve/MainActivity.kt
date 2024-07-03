@@ -1,4 +1,4 @@
-package com.werewolfstudiios.instasolve.insta_solve
+package com.harshnj.instasolve
 
 import io.flutter.embedding.android.FlutterActivity
 

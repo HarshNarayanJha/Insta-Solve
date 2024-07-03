@@ -176,7 +176,7 @@ class _ScanPageState extends State<ScanPage> {
     return Scaffold(
       appBar: const InstasolveAppBar(),
       body: SingleChildScrollView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
         scrollDirection: Axis.vertical,
         physics: const PageScrollPhysics(),
         child: Responsive(
