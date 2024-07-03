@@ -178,10 +178,7 @@ class _ScanPageState extends State<ScanPage> {
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         scrollDirection: Axis.vertical,
-        physics: (Platform.isLinux)
-            ? const PageScrollPhysics()
-            : const BouncingScrollPhysics(
-                decelerationRate: ScrollDecelerationRate.fast),
+        physics: const PageScrollPhysics(),
         child: Responsive(
           child: Container(
             width: w,
@@ -207,60 +204,34 @@ class _ScanPageState extends State<ScanPage> {
                 const SizedBox(height: 30),
                 Stack(
                   children: [
-                    if (_image == null)
-                      Container(
-                        width: 300,
-                        height: 300,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.grey.shade800),
-                      )
-                    else
-                      Container(
-                        width: 300,
-                        height: 300,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.grey.shade800),
-                      ),
+                    Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.grey.shade800),
+                    ),
                     SizedBox(
                       width: 300,
                       height: 300,
                       child: (_image == null)
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    _openGallery();
-                                  },
-                                  icon: const Icon(
-                                    Icons.photo,
-                                    size: 48,
-                                  ),
-                                  color: Colors.white,
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    _openCamera();
-                                  },
-                                  icon: const Icon(
-                                    Icons.camera_alt,
-                                    size: 48,
-                                  ),
-                                  color: Colors.white,
-                                ),
-                              ],
+                          ? CameraButtonRow(
+                              openCamera: _openCamera,
+                              openGallary: _openGallery,
                             )
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Stack(children: [
                                 GestureDetector(
-                                    onTap: () {
-                                      _toggleImageOverlay();
-                                    },
-                                    child: Center(
-                                        child: Image.file(File(_image!.path)))),
+                                  onTap: () {
+                                    _toggleImageOverlay();
+                                  },
+                                  child: Center(
+                                    child: Image.file(
+                                      File(_image!.path),
+                                    ),
+                                  ),
+                                ),
                                 AnimatedOpacity(
                                   opacity: imageOverlayVisible ? 1.0 : 0.0,
                                   duration: const Duration(milliseconds: 250),
@@ -268,23 +239,8 @@ class _ScanPageState extends State<ScanPage> {
                                     onTap: () {
                                       _toggleImageOverlay();
                                     },
-                                    child: Container(
-                                        height: 300,
-                                        width: 300,
-                                        decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.6)),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _removeImage();
-                                          },
-                                          child: const Icon(
-                                            Icons.delete_forever_outlined,
-                                            color: Colors.red,
-                                            semanticLabel: "Close Image",
-                                            size: 72,
-                                          ),
-                                        )),
+                                    child: ImageDeleteOverlay(
+                                        removeImage: _removeImage),
                                   ),
                                 ),
                               ]),
@@ -292,9 +248,7 @@ class _ScanPageState extends State<ScanPage> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 40,
-                ),
+                const SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: SizedBox(
@@ -337,7 +291,7 @@ class _ScanPageState extends State<ScanPage> {
                   width: 350,
                   label: const Text("Question's subject"),
                   menuHeight: 300,
-                  leadingIcon: const Icon(Icons.subject_outlined),
+                  leadingIcon: const Icon(Icons.subject_rounded),
                   initialSelection: subject.name,
                   helperText:
                       "Finetune the question based on subject\nSometimes 'Generic' may provide better solutions",
@@ -360,7 +314,7 @@ class _ScanPageState extends State<ScanPage> {
                   width: 350,
                   label: const Text("Question's Grade level"),
                   menuHeight: 300,
-                  leadingIcon: const Icon(Icons.class_outlined),
+                  leadingIcon: const Icon(Icons.class_rounded),
                   initialSelection: gradeValue,
                   helperText:
                       "Question's grade level\nSet to no grade to auto determine",
@@ -450,6 +404,68 @@ class _ScanPageState extends State<ScanPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ImageDeleteOverlay extends StatelessWidget {
+  const ImageDeleteOverlay({
+    super.key,
+    required this.removeImage,
+  });
+
+  final VoidCallback removeImage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        height: 300,
+        width: 300,
+        decoration: BoxDecoration(color: Colors.black.withOpacity(0.6)),
+        child: GestureDetector(
+          onTap: removeImage,
+          child: const Icon(
+            Icons.delete_forever_outlined,
+            color: Colors.red,
+            semanticLabel: "Close Image",
+            size: 72,
+          ),
+        ));
+  }
+}
+
+class CameraButtonRow extends StatelessWidget {
+  const CameraButtonRow({
+    super.key,
+    required this.openGallary,
+    required this.openCamera,
+  });
+
+  final VoidCallback openGallary;
+  final VoidCallback openCamera;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        IconButton(
+          onPressed: openGallary,
+          icon: const Icon(
+            Icons.photo,
+            size: 48,
+          ),
+          color: Colors.white,
+        ),
+        IconButton(
+          onPressed: openCamera,
+          icon: const Icon(
+            Icons.camera_alt,
+            size: 48,
+          ),
+          color: Colors.white,
+        ),
+      ],
     );
   }
 }

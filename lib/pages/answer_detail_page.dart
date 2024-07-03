@@ -63,7 +63,6 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
                   ),
             const SizedBox(height: 20),
             AnswerViewWidget(
-                w: double.maxFinite,
                 renderingEngine: const TeXViewRenderingEngine.mathjax(),
                 responseText: ans.response,
                 textAnimationIndex: 1),

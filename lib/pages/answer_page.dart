@@ -233,7 +233,7 @@ class _AnswerPageState extends State<AnswerPage> {
                   ? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(promptText,
-                          style: Theme.of(context).textTheme.headlineMedium),
+                          style: Theme.of(context).textTheme.headlineSmall),
                     )
                   : Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -244,20 +244,8 @@ class _AnswerPageState extends State<AnswerPage> {
                               .copyWith(color: Colors.grey)),
                     ),
               const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: AnimatedTextKit(
-                  animatedTexts: [
-                    TyperAnimatedText("Answer :",
-                        textStyle: Theme.of(context)
-                            .textTheme
-                            .headlineLarge
-                            ?.copyWith(fontWeight: FontWeight.w500),
-                        speed: const Duration(milliseconds: 200)),
-                  ],
-                  isRepeatingAnimation: false,
-                ),
-              ),
+              Divider(),
+              const SizedBox(height: 20),
               if (_connectionStatus == InternetStatus.connected ||
                   responseText.isNotEmpty)
                 (responseText.isEmpty)
@@ -294,7 +282,6 @@ class _AnswerPageState extends State<AnswerPage> {
                         ),
                       )
                     : AnswerViewWidget(
-                        w: w,
                         renderingEngine: renderingEngine,
                         responseText: responseText,
                         textAnimationIndex: textAnimationIndex)

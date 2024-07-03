@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:insta_solve/data/hive_manager.dart';
@@ -46,34 +44,12 @@ class AnswerCardWidget extends StatelessWidget {
         openAnswer(context, ans, index);
       },
       child: Card.filled(
-        margin: EdgeInsets.only(left: 16, right: 16, bottom: 8, top: 8),
+        margin: const EdgeInsets.only(left: 0, right: 0, bottom: 8, top: 8),
         color: Theme.of(context).colorScheme.tertiaryContainer,
         child: Column(
           children: [
             (ans.imagePath != null)
-                ? ClipRRect(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        topRight: Radius.circular(10)),
-                    child: ShaderMask(
-                        shaderCallback: (bounds) {
-                          return LinearGradient(
-                                  colors: [Colors.transparent, Colors.black],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter)
-                              .createShader(bounds);
-                        },
-                        blendMode: BlendMode.darken,
-                        child: Hero(
-                          tag: 'image-$index',
-                          child: Image.file(
-                            File(ans.imagePath!),
-                            fit: BoxFit.fitWidth,
-                            height: 100,
-                            width: double.maxFinite,
-                          ),
-                        )),
-                  )
+                ? _buildImage()
                 : Padding(
                     padding: const EdgeInsets.only(top: 20),
                     child: Text("No Image for this question",
@@ -103,72 +79,38 @@ class AnswerCardWidget extends StatelessWidget {
                             textAlign: TextAlign.right,
                           ),
                         ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
-                      Icon(Icons.book_rounded),
+                      const Icon(Icons.subject_rounded),
                       Text(
                           ' ${ans.subject.replaceFirst("Photo", '').toTitleCase()}'),
-                      Spacer(),
-                      Icon(Icons.class_outlined),
+                      const Spacer(),
+                      const Icon(Icons.class_rounded),
                       Text(' ${ans.grade}'),
                     ],
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Row(
                     children: [
                       Container(
                         alignment: Alignment.centerLeft,
-                        child: (ans.response.length > 30)
-                            ? Text(
-                                "${ans.response.trim().replaceAll('\n', ' ').substring(0, 30)}...",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onTertiaryContainer),
-                              )
-                            : Text(
-                                ans.response,
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onTertiaryContainer),
-                              ),
+                        child: SizedBox(
+                          width: 200,
+                          child: Text(
+                            ans.response.replaceAll('\n', ' ').toPlainText(),
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                            softWrap: false,
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onTertiaryContainer),
+                          ),
+                        ),
                       ),
-                      Spacer(),
-                      PopupMenuButton(
-                        padding: EdgeInsets.all(0),
-                        position: PopupMenuPosition.under,
-                        enableFeedback: true,
-                        itemBuilder: (context) {
-                          return [
-                            PopupMenuItem(
-                              child: Text("Open"),
-                              onTap: () {
-                                openAnswer(context, ans, index);
-                              },
-                            ),
-                            PopupMenuItem(
-                              child: Text("Delete"),
-                              onTap: () async {
-                                await deleteAnswer(index);
-                              },
-                            ),
-                            PopupMenuItem(
-                              child: Text("Ask Again"),
-                              onTap: () {
-                                Navigator.of(context)
-                                    .pushNamed(ScanPage.routeName, arguments: {
-                                  AnswerCardWidget.imageKey: ans.imagePath,
-                                  AnswerCardWidget.customPromptKey: ans.prompt,
-                                  AnswerCardWidget.subjectKey: ans.subject,
-                                  AnswerCardWidget.gradeKey: ans.grade
-                                });
-                              },
-                            ),
-                          ];
-                        },
-                      )
+                      const Spacer(),
+                      buildPopupMenu()
                     ],
                   ),
                 ],
@@ -177,6 +119,66 @@ class AnswerCardWidget extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  PopupMenuButton<dynamic> buildPopupMenu() {
+    return PopupMenuButton(
+      padding: EdgeInsets.all(0),
+      position: PopupMenuPosition.under,
+      enableFeedback: true,
+      itemBuilder: (context) {
+        return [
+          PopupMenuItem(
+            child: Text("Open"),
+            onTap: () {
+              openAnswer(context, ans, index);
+            },
+          ),
+          PopupMenuItem(
+            child: Text("Delete"),
+            onTap: () async {
+              await deleteAnswer(index);
+            },
+          ),
+          PopupMenuItem(
+            child: Text("Ask Again"),
+            onTap: () {
+              Navigator.of(context).pushNamed(ScanPage.routeName, arguments: {
+                AnswerCardWidget.imageKey: ans.imagePath,
+                AnswerCardWidget.customPromptKey: ans.prompt,
+                AnswerCardWidget.subjectKey: ans.subject,
+                AnswerCardWidget.gradeKey: ans.grade
+              });
+            },
+          ),
+        ];
+      },
+    );
+  }
+
+  Widget _buildImage() {
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+      child: ShaderMask(
+          shaderCallback: (bounds) {
+            return const LinearGradient(
+                    colors: [Colors.transparent, Colors.black],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter)
+                .createShader(bounds);
+          },
+          blendMode: BlendMode.darken,
+          child: Hero(
+            tag: 'image-$index',
+            child: Image.file(
+              File(ans.imagePath!),
+              fit: BoxFit.fitWidth,
+              height: 100,
+              width: double.maxFinite,
+            ),
+          )),
     );
   }
 }
