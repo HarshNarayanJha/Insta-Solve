@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:insta_solve/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/models/answer.dart';
@@ -10,7 +12,6 @@ import 'package:insta_solve/theme/theme.dart';
 import 'package:insta_solve/theme/util.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
 
   // init hive
@@ -20,7 +21,12 @@ void main() async {
   // open a box
   await Hive.openBox<Answer>(UtilData.boxName);
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -29,16 +35,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
-    final brightness = View.of(context).platformDispatcher.platformBrightness;
+    // final brightness = View.of(context).platformDispatcher.platformBrightness;
     TextTheme textTheme = createTextTheme(context, "Roboto", "Baloo 2");
     MaterialTheme theme = MaterialTheme(textTheme);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Instasolve',
-      theme: brightness == Brightness.light ? theme.light() : theme.dark(),
-
+      theme: Provider.of<ThemeProvider>(context).userTheme == Brightness.light ? theme.light() : theme.dark(),
       home: const HomePage(),
       routes: {
         HomePage.routeName: (context) => const HomePage(),

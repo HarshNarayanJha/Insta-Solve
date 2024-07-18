@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:insta_solve/data/hive_manager.dart';
+import 'package:insta_solve/data/preferences_service.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/pages/answer_page.dart';
 import 'package:insta_solve/widgets/answer_card_widget.dart';
@@ -27,9 +28,11 @@ class ScanPage extends StatefulWidget {
 }
 
 class _ScanPageState extends State<ScanPage> {
+  final preferencesService = PreferencesService();
+
   XFile? _image;
   Prompt subject = UtilData.qtypes[0];
-  String gradeValue = UtilData.grades[9];
+  String gradeValue = UtilData.grades[0];
   TextEditingController customInput = TextEditingController();
   bool imageOverlayVisible = false;
 
@@ -40,6 +43,15 @@ class _ScanPageState extends State<ScanPage> {
   void initState() {
     super.initState();
     _checkForImagePickerLostData();
+    _loadPreferences();
+  }
+
+  void _loadPreferences() async {
+    final savedSettings = await preferencesService.getSettings();
+
+    setState(() {
+      gradeValue = UtilData.grades[savedSettings.defaultGrade];
+    });
   }
 
   void _openGallery() {

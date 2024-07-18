@@ -25,6 +25,7 @@ class InstasolveAppBar extends StatelessWidget implements PreferredSizeWidget {
               showModalBottomSheet(
                 context: context,
                 barrierColor: Colors.black45,
+                isScrollControlled: true,
                 sheetAnimationStyle: AnimationStyle(
                     duration: Durations.medium1,
                     curve: Curves.easeInSine,

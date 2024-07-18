@@ -10,6 +10,7 @@ import 'package:flutter_tex/flutter_tex.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:insta_solve/data/hive_manager.dart';
+import 'package:insta_solve/data/preferences_service.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/env/env.dart';
 import 'package:insta_solve/pages/scan_page.dart';
@@ -29,11 +30,14 @@ class AnswerPage extends StatefulWidget {
 }
 
 class _AnswerPageState extends State<AnswerPage> {
+  final preferencesService = PreferencesService();
+
   final TeXViewRenderingEngine renderingEngine =
       const TeXViewRenderingEngine.mathjax();
 
   late final ScrollController pageScrollController;
   bool fabVisible = false;
+  bool autosave = false;
   bool answerSaved = false;
   int answerKey = -1;
 
@@ -42,6 +46,7 @@ class _AnswerPageState extends State<AnswerPage> {
   double spinnerOpacity = 0;
 
   String responseText = "";
+  bool modelLoaded = false;
   bool apiCalled = false;
 
   InternetStatus? _connectionStatus;
@@ -67,23 +72,59 @@ class _AnswerPageState extends State<AnswerPage> {
       });
     });
 
-    GenerationConfig generationConfig = GenerationConfig(
-      temperature: 0.2,
-      topK: 1,
-      topP: 1,
-      maxOutputTokens: 1024,
-    );
-
-    _model = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: Env.apiKey,
-        generationConfig: generationConfig);
+    // model init moved here!
+    loadPreferences();
   }
 
   @override
   void dispose() {
     _subscription.cancel();
     super.dispose();
+  }
+
+  void loadPreferences() async {
+    final savedSettings = await preferencesService.getSettings();
+
+    bool customApiKey = false;
+    String userApiKey = "";
+
+    setState(() {
+      autosave = savedSettings.autosave;
+      customApiKey = savedSettings.customApiKey;
+      userApiKey = savedSettings.userApiKey ?? "";
+    });
+
+    GenerationConfig generationConfig = GenerationConfig(
+      temperature: 0.2,
+      topK: 1,
+      topP: 1,
+      // maxOutputTokens: 1024,
+    );
+
+    final apiKeyRegex = RegExp(r'^AIza[0-9A-Za-z\\-_]{35}$');
+
+    if (customApiKey) {
+      if (apiKeyRegex.hasMatch(userApiKey)) {
+        _model = GenerativeModel(
+            model: 'gemini-1.5-flash',
+            apiKey: userApiKey,
+            generationConfig: generationConfig);
+      } else {
+        // Invalid Api Key Provided!
+        apiCalled = true;
+        responseText =
+            "Invalid API Key supplied! Please verify your API key in settings, or turn off Custom API Key!";
+      }
+    } else {
+      _model = GenerativeModel(
+          model: 'gemini-1.5-flash',
+          apiKey: Env.apiKey,
+          generationConfig: generationConfig);
+    }
+
+    setState(() {
+      modelLoaded = true;
+    });
   }
 
   Future<void> getResponse(
@@ -96,7 +137,6 @@ class _AnswerPageState extends State<AnswerPage> {
 
     // first add the base prompt based on subject
     if (subject == Prompt.generic) {
-      // it's the generic
       subject = (img != null) ? Prompt.genericPhoto : Prompt.generic;
     }
 
@@ -127,35 +167,53 @@ class _AnswerPageState extends State<AnswerPage> {
     }
 
     try {
+      dev.log(
+          "Calling Google ****************************************************");
       final response = await _model.generateContent(content);
-      dev.log("Calling Google ${response.text}");
 
       setState(() {
         if (response.text != null) {
           responseText = response.text!;
           fabVisible = true;
+          if (autosave) {
+            _saveAnswer(img, grade, userPrompt, subject, responseText);
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: const Text("Auto Saved to Library!!"),
+              action: SnackBarAction(
+                  label: "Delete",
+                  onPressed: () async {
+                    await HiveManager.deleteAnswer(answerKey);
+                    setState(() {
+                      answerSaved = false;
+                    });
+                  }),
+            ));
+          }
         } else {
           responseText = "Error fetching Answer";
         }
       });
 
       // analytics
-      await http.post(
-        Uri.parse('https://api.jsonbin.io/v3/b'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'X-Master-Key':
-              r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
-        },
-        body: jsonEncode(<String, String>{
-          'grade': grade,
-          'prompt': userPrompt,
-          'subject': subject.name,
-          'response': responseText,
-          'id': 'sakshi'
-        }),
-      );
+      // await http.post(
+      //   Uri.parse('https://api.jsonbin.io/v3/b'),
+      //   headers: <String, String>{
+      //     'Content-Type': 'application/json',
+      //     'X-Master-Key':
+      //         r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
+      //   },
+      //   body: jsonEncode(<String, String>{
+      //     'grade': grade,
+      //     'prompt': userPrompt,
+      //     'subject': subject.name,
+      //     'response': responseText,
+      //     'id': 'me'
+      //   }),
+      // );
     } catch (e) {
+      // if (e.runtimeType == )
       setState(() {
         responseText = e.toString();
       });
@@ -172,7 +230,9 @@ class _AnswerPageState extends State<AnswerPage> {
     int key =
         await HiveManager.saveAnswer(img, grade, userPrompt, subject, response);
     answerKey = key;
-    answerSaved = true;
+    setState(() {
+      answerSaved = true;
+    });
   }
 
   @override
@@ -196,7 +256,9 @@ class _AnswerPageState extends State<AnswerPage> {
 
     // print([file, promptText, subject, grade]);
 
-    if (_connectionStatus == InternetStatus.connected && !apiCalled) {
+    if (_connectionStatus == InternetStatus.connected &&
+        modelLoaded &&
+        !apiCalled) {
       getResponse(file, promptText, subject, grade);
       apiCalled = true;
     }
@@ -308,7 +370,9 @@ class _AnswerPageState extends State<AnswerPage> {
                     label: "Delete",
                     onPressed: () async {
                       await HiveManager.deleteAnswer(answerKey);
-                      answerSaved = false;
+                      setState(() {
+                        answerSaved = false;
+                      });
                     }),
               ));
               return;
@@ -322,14 +386,18 @@ class _AnswerPageState extends State<AnswerPage> {
                   label: "Delete",
                   onPressed: () async {
                     await HiveManager.deleteAnswer(answerKey);
-                    answerSaved = false;
+                    setState(() {
+                      answerSaved = false;
+                    });
                   }),
             ));
 
             await _saveAnswer(file, grade, promptText, subject, responseText);
           },
           label: const Text("Save Answer"),
-          icon: Icon(answerSaved ? Icons.bookmark_add_rounded : Icons.bookmark_add_rounded),
+          icon: Icon(answerSaved
+              ? Icons.bookmark_added_rounded
+              : Icons.bookmark_add_rounded),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
