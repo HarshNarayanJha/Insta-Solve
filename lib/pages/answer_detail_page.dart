@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/models/answer.dart';
 import 'package:insta_solve/pages/home.dart';
 import 'package:insta_solve/widgets/answer_view_widget.dart';
@@ -35,7 +36,9 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
           children: [
             const SizedBox(height: 25),
             (ans.imagePath != null)
-                ? Hero(tag: 'image-$index', child: ImageFrame(file: XFile(ans.imagePath!)))
+                ? Hero(
+                    tag: 'image-$index',
+                    child: ImageFrame(file: XFile(ans.imagePath!)))
                 : Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text("No image for this question",
@@ -43,7 +46,7 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
                             .textTheme
                             .bodySmall!
                             .copyWith(color: Colors.grey))),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             (ans.prompt.isNotEmpty)
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -61,7 +64,19 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
                             .bodySmall!
                             .copyWith(color: Colors.grey)),
                   ),
-            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.subject_rounded),
+                  Text(' ${ans.subject.replaceFirst("Photo", '').toTitleCase()}'),
+                  const Spacer(),
+                  const Icon(Icons.class_rounded),
+                  Text(' ${ans.grade}'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             AnswerViewWidget(
                 renderingEngine: const TeXViewRenderingEngine.mathjax(),
                 responseText: ans.response,

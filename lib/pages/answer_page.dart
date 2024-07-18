@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'dart:math';
 import 'dart:developer' as dev;
 
@@ -279,7 +277,7 @@ class _AnswerPageState extends State<AnswerPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 25),
+              const SizedBox(height: 15),
               (file != null)
                   ? ImageFrame(file: file)
                   : Padding(
@@ -304,7 +302,20 @@ class _AnswerPageState extends State<AnswerPage> {
                               .bodySmall!
                               .copyWith(color: Colors.grey)),
                     ),
-              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.subject_rounded),
+                    Text(
+                        ' ${subject.name.replaceFirst("Photo", '').toTitleCase()}'),
+                    const Spacer(),
+                    const Icon(Icons.class_rounded),
+                    Text(' $grade'),
+                  ],
+                ),
+              ),
+              // const SizedBox(height: 20),
               const Divider(),
               const SizedBox(height: 20),
               if (_connectionStatus == InternetStatus.connected ||
@@ -394,7 +405,7 @@ class _AnswerPageState extends State<AnswerPage> {
 
             await _saveAnswer(file, grade, promptText, subject, responseText);
           },
-          label: const Text("Save Answer"),
+          label: Text(answerSaved ? "Answer Saved" : "Save Answer"),
           icon: Icon(answerSaved
               ? Icons.bookmark_added_rounded
               : Icons.bookmark_add_rounded),
