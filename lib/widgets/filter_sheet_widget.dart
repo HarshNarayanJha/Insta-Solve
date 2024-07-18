@@ -65,7 +65,7 @@ class _FilterSheetState extends State<FilterSheet> {
           ListTile(
             leading: const Text("Filter Subject"),
             leadingAndTrailingTextStyle:
-                Theme.of(context).textTheme.labelMedium,
+                Theme.of(context).textTheme.bodyLarge,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -99,9 +99,9 @@ class _FilterSheetState extends State<FilterSheet> {
             ),
           ),
           ListTile(
-            leading: const Text("Filter Class"),
+            leading: const Text("Filter Grade"),
             leadingAndTrailingTextStyle:
-                Theme.of(context).textTheme.labelMedium,
+                Theme.of(context).textTheme.bodyLarge,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -138,7 +138,7 @@ class _FilterSheetState extends State<FilterSheet> {
             leading: Text(
                 "Sort ${sortOldFirst ? '(Oldest First)' : '(Newest First)'}"),
             leadingAndTrailingTextStyle:
-                Theme.of(context).textTheme.labelMedium,
+                Theme.of(context).textTheme.bodyLarge,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -149,7 +149,7 @@ class _FilterSheetState extends State<FilterSheet> {
                     setState(() {
                       sortOldFirst = !sortOldFirst;
                     });
-                    
+
                   },
                   icon: const Icon(Icons.swap_vert_rounded),
                 ),

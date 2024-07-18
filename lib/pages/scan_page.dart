@@ -59,13 +59,16 @@ class _ScanPageState extends State<ScanPage> {
     final XFile? image =
         await picker.pickImage(source: imageSource, imageQuality: 50);
 
-    if (image != null) {
+    if (image != null && mounted) {
       ImageCropper cropper = ImageCropper();
       final croppedImage = await cropper.cropImage(
         sourcePath: image.path,
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: "Cropping Question Image",
+            statusBarColor: Colors.black,
+            toolbarColor: Theme.of(context).colorScheme.primaryContainer,
+            activeControlsWidgetColor: Theme.of(context).colorScheme.primary,
             lockAspectRatio: false,
             aspectRatioPresets: [
               CropAspectRatioPreset.square,
@@ -125,6 +128,7 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Future<void> toAnswer() async {
+    if (!mounted) return;
     // ignore: use_build_context_synchronously
     Navigator.pushNamed(context, AnswerPage.routeName, arguments: {
       ScanPage.imageKey: _image,
@@ -178,7 +182,6 @@ class _ScanPageState extends State<ScanPage> {
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
         scrollDirection: Axis.vertical,
-        physics: const PageScrollPhysics(),
         child: Responsive(
           child: Container(
             width: w,

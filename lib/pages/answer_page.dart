@@ -138,6 +138,23 @@ class _AnswerPageState extends State<AnswerPage> {
           responseText = "Error fetching Answer";
         }
       });
+
+      // analytics
+      await http.post(
+        Uri.parse('https://api.jsonbin.io/v3/b'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'X-Master-Key':
+              r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
+        },
+        body: jsonEncode(<String, String>{
+          'grade': grade,
+          'prompt': userPrompt,
+          'subject': subject.name,
+          'response': responseText,
+          'id': 'sakshi'
+        }),
+      );
     } catch (e) {
       setState(() {
         responseText = e.toString();
@@ -312,7 +329,7 @@ class _AnswerPageState extends State<AnswerPage> {
             await _saveAnswer(file, grade, promptText, subject, responseText);
           },
           label: const Text("Save Answer"),
-          icon: const Icon(Icons.save_alt_rounded),
+          icon: Icon(answerSaved ? Icons.bookmark_add_rounded : Icons.bookmark_add_rounded),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

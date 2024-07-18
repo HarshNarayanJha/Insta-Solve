@@ -24,7 +24,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});                                                                             
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -33,12 +33,12 @@ class MyApp extends StatelessWidget {
     final brightness = View.of(context).platformDispatcher.platformBrightness;
     TextTheme textTheme = createTextTheme(context, "Roboto", "Baloo 2");
     MaterialTheme theme = MaterialTheme(textTheme);
-    
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Instasolve',
       theme: brightness == Brightness.light ? theme.light() : theme.dark(),
-      
+
       home: const HomePage(),
       routes: {
         HomePage.routeName: (context) => const HomePage(),

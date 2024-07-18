@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
       sortOldFirst = newSort;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     // DateTime now = DateTime.now();
