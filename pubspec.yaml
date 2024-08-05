@@ -53,6 +53,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   shared_preferences: ^2.2.3
   provider: ^6.1.2
+  fluentui_system_icons: ^1.1.251
 
 dev_dependencies:
   flutter_test:
