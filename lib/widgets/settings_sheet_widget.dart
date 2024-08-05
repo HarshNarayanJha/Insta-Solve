@@ -5,6 +5,7 @@ import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/models/settings.dart';
 import 'package:insta_solve/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingSheet extends StatefulWidget {
   const SettingSheet({super.key});
@@ -83,7 +84,8 @@ class _SettingSheetState extends State<SettingSheet> {
                     value: defaultGrade,
                     icon: Container(
                       padding: const EdgeInsets.only(left: 16),
-                      child: const Icon(FluentIcons.video_person_star_24_filled),
+                      child:
+                          const Icon(FluentIcons.video_person_star_24_filled),
                     ),
                     onChanged: (String? value) {
                       setState(() {
@@ -176,15 +178,34 @@ class _SettingSheetState extends State<SettingSheet> {
             ),
             // const Spacer(),
             const Divider(),
-            const AboutListTile(
+            AboutListTile(
               applicationVersion: "v1.0.0+4",
               applicationName: "Insta Solve",
-              icon: Icon(Icons.info_rounded),
+              icon: const Icon(Icons.info_rounded),
               applicationLegalese: "©️ 2024 Harsh Narayan Jha",
               aboutBoxChildren: [
-                Text(""),
-                Text("Developed for the Google Gemini API Competition"),
-                Text("Built with Flutter, VSCode, and Zed")
+                const Text(""),
+                const Text("Developed for the Google Gemini API Competition"),
+                const Text("Built with Flutter, VSCode, and Zed"),
+                const Text(""),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          _launchURL("https://instasolve.netlify.app");
+                        },
+                        child: const Text("Website"),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          _launchURL(
+                              "https://github.com/HarshNarayanJha/Insta-Solve");
+                        },
+                        child: const Text("GitHub"),
+                      ),
+                    ])
               ],
               // applicationIcon: ImageIcon(ExactAssetImage("assets/launcher/icon.png")),
             ),
@@ -195,6 +216,16 @@ class _SettingSheetState extends State<SettingSheet> {
         ),
       ),
     );
+  }
+
+  void _launchURL(String url) async {
+    final Uri urlParsed = Uri.parse(url);
+
+    if (await canLaunchUrl(urlParsed)) {
+      await launchUrl(urlParsed, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   void _saveSettings() {
