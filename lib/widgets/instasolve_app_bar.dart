@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:insta_solve/widgets/settings_sheet_widget.dart';
 
@@ -20,7 +21,7 @@ class InstasolveAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       actions: [
         IconButton(
-            icon: const Icon(Icons.settings_rounded),
+            icon: const Icon(FluentIcons.settings_24_filled),
             onPressed: () {
               showModalBottomSheet(
                 context: context,

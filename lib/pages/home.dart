@@ -196,7 +196,7 @@ class _HomePageState extends State<HomePage> {
         duration: Durations.medium1,
         offset: fabVisible ? Offset.zero : Offset.fromDirection(3.14 / 2, 1.5),
         child: FloatingActionButton.extended(
-            tooltip: "Scan Picture",
+            tooltip: "Capture New Question",
             label: const Text("New Scan"),
             icon: const Icon(Icons.camera_alt_rounded),
             onPressed: () {

@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:insta_solve/data/util_data.dart';
 
@@ -47,7 +48,7 @@ class AnswerFilterWidget extends StatelessWidget {
                   value: filterSubject,
                   icon: Container(
                     padding: const EdgeInsets.only(left: 16),
-                    child: const Icon(Icons.subject_rounded),
+                    child: const Icon(FluentIcons.book_letter_24_filled),
                   ),
                   onChanged: (String? value) {
                     // log(value!);
@@ -67,7 +68,7 @@ class AnswerFilterWidget extends StatelessWidget {
               DropdownButton<String>(
                 menuMaxHeight: 250,
                 value: filterClass,
-                icon: const Icon(Icons.class_rounded),
+                icon: const Icon(FluentIcons.video_person_star_24_filled),
                 onChanged: (String? value) {
                   onFilterClass(value!);
                 },

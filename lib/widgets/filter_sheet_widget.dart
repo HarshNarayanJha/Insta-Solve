@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:insta_solve/data/util_data.dart';
 
@@ -76,7 +77,7 @@ class _FilterSheetState extends State<FilterSheet> {
                   value: filterSubject,
                   icon: Container(
                     padding: const EdgeInsets.only(left: 16),
-                    child: const Icon(Icons.subject_rounded),
+                    child: const Icon(FluentIcons.book_letter_24_filled),
                   ),
                   onChanged: (String? value) {
                     widget.onFilterSubject(value!);
@@ -112,7 +113,7 @@ class _FilterSheetState extends State<FilterSheet> {
                   value: filterClass,
                   icon: Container(
                     padding: const EdgeInsets.only(left: 16),
-                    child: const Icon(Icons.class_rounded),
+                    child: const Icon(FluentIcons.video_person_star_24_filled),
                   ),
                   onChanged: (String? value) {
                     widget.onFilterClass(value!);

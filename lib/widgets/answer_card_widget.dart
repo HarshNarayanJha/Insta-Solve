@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:insta_solve/data/hive_manager.dart';
 import 'package:insta_solve/data/util_data.dart';
@@ -82,11 +83,11 @@ class AnswerCardWidget extends StatelessWidget {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      const Icon(Icons.subject_rounded),
+                      const Icon(FluentIcons.book_letter_24_filled),
                       Text(
                           ' ${ans.subject.replaceFirst("Photo", '').toTitleCase()}'),
                       const Spacer(),
-                      const Icon(Icons.class_rounded),
+                      const Icon(FluentIcons.video_person_star_24_filled),
                       Text(' ${ans.grade}'),
                     ],
                   ),

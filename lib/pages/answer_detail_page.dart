@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 import 'package:image_picker/image_picker.dart';
@@ -68,10 +69,10 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  const Icon(Icons.subject_rounded),
+                  const Icon(FluentIcons.book_letter_24_filled),
                   Text(' ${ans.subject.replaceFirst("Photo", '').toTitleCase()}'),
                   const Spacer(),
-                  const Icon(Icons.class_rounded),
+                  const Icon(FluentIcons.video_person_star_24_filled),
                   Text(' ${ans.grade}'),
                 ],
               ),

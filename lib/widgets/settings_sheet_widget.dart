@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:insta_solve/data/preferences_service.dart';
 import 'package:insta_solve/data/util_data.dart';
@@ -59,7 +60,7 @@ class _SettingSheetState extends State<SettingSheet> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.settings_rounded),
+                  const Icon(FluentIcons.settings_24_filled),
                   const SizedBox(width: 10),
                   Text(
                     "Preferences",
@@ -82,7 +83,7 @@ class _SettingSheetState extends State<SettingSheet> {
                     value: defaultGrade,
                     icon: Container(
                       padding: const EdgeInsets.only(left: 16),
-                      child: const Icon(Icons.class_rounded),
+                      child: const Icon(FluentIcons.video_person_star_24_filled),
                     ),
                     onChanged: (String? value) {
                       setState(() {
@@ -182,13 +183,13 @@ class _SettingSheetState extends State<SettingSheet> {
               applicationLegalese: "©️ 2024 Harsh Narayan Jha",
               aboutBoxChildren: [
                 Text(""),
-                Text("Made for the Google Gemini API Competion"),
-                Text("Made in flutter and VSCode + Zed")
+                Text("Developed for the Google Gemini API Competition"),
+                Text("Built with Flutter, VSCode, and Zed")
               ],
               // applicationIcon: ImageIcon(ExactAssetImage("assets/launcher/icon.png")),
             ),
             const ListTile(
-              title: Text("Made with ❤️ by Harsh Narayan Jha"),
+              title: Text("Created with ❤️ by Harsh Narayan Jha"),
             ),
           ],
         ),

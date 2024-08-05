@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -91,7 +92,7 @@ class _ScanPageState extends State<ScanPage> {
             ],
           ),
           IOSUiSettings(
-            title: "Cropping Question Image",
+            title: "Crop Image for Question",
             aspectRatioLockEnabled: false,
             aspectRatioPresets: [
               CropAspectRatioPreset.square,
@@ -204,18 +205,18 @@ class _ScanPageState extends State<ScanPage> {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  "Choose either Image or Image with prompt or only Prompt.",
+                  "Ask question from an image or just type it out. You may use both methods for better results.",
                   style: Theme.of(context).textTheme.labelMedium,
                   textAlign: TextAlign.center,
                 ),
-                Text(
-                  "NOTE: if the app closes after taking a photo, reopen this screen to get the photo back",
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelMedium
-                      ?.copyWith(color: Colors.grey.shade600),
-                  textAlign: TextAlign.center,
-                ),
+                // Text(
+                //   "NOTE: if the app closes after taking a photo, reopen this screen to get the photo back",
+                //   style: Theme.of(context)
+                //       .textTheme
+                //       .labelMedium
+                //       ?.copyWith(color: Colors.grey.shade600),
+                //   textAlign: TextAlign.center,
+                // ),
                 const SizedBox(height: 30),
                 Stack(
                   children: [
@@ -264,6 +265,22 @@ class _ScanPageState extends State<ScanPage> {
                     ),
                   ],
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 36.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        onPressed: _openGallery,
+                        icon: const Icon(
+                          FluentIcons.image_add_24_filled,
+                          size: 36,
+                        ),
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -280,7 +297,7 @@ class _ScanPageState extends State<ScanPage> {
                       maxLength: 60,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.all(16),
-                        label: const Text("Custom Instructions"),
+                        label: Text((_image == null) ? "Ask your question" : "Image context"),
                         suffixIcon: AnimatedOpacity(
                           duration: Durations.short3,
                           opacity: customInput.text.isEmpty ? 0.0 : 1.0,
@@ -294,7 +311,7 @@ class _ScanPageState extends State<ScanPage> {
                           ),
                         ),
                         helperText:
-                            "Solve 5th question.. answer in points.. etc",
+                            "Type your question or additional details here",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -305,12 +322,12 @@ class _ScanPageState extends State<ScanPage> {
                 const SizedBox(height: 40),
                 DropdownMenu<String>(
                   width: 350,
-                  label: const Text("Question's subject"),
+                  label: const Text("Subject"),
                   menuHeight: 300,
-                  leadingIcon: const Icon(Icons.subject_rounded),
+                  leadingIcon: const Icon(FluentIcons.book_letter_24_filled),
                   initialSelection: subject.name,
                   helperText:
-                      "Finetune the question based on subject\nSometimes 'Generic' may provide better solutions",
+                      "Choose a subject to refine the question\nFor broader results, you may select 'Generic'",
                   onSelected: (String? value) {
                     setState(() {
                       subject =
@@ -328,12 +345,13 @@ class _ScanPageState extends State<ScanPage> {
                 const SizedBox(height: 40),
                 DropdownMenu<String>(
                   width: 350,
-                  label: const Text("Question's Grade level"),
+                  label: const Text("Grade level"),
                   menuHeight: 300,
-                  leadingIcon: const Icon(Icons.class_rounded),
+                  leadingIcon:
+                      const Icon(FluentIcons.video_person_star_24_filled),
                   initialSelection: gradeValue,
                   helperText:
-                      "Question's grade level\nSet to no grade to auto determine",
+                      "Specify the grade level to tailor the results.\nChoose 'No Specific Grade' for automatic determination.",
                   onSelected: (String? value) {
                     setState(() {
                       gradeValue = value!;
@@ -364,7 +382,7 @@ class _ScanPageState extends State<ScanPage> {
                                     .colorScheme
                                     .tertiaryContainer))
                         : const ButtonStyle(),
-                    label: Text("Solve!",
+                    label: Text("Solve",
                         style: TextStyle(
                             color: (gotData)
                                 ? Theme.of(context)
@@ -374,7 +392,7 @@ class _ScanPageState extends State<ScanPage> {
                 const SizedBox(height: 10),
                 ElevatedButton.icon(
                     icon: Icon(
-                      Icons.save_as_rounded,
+                      FluentIcons.drafts_24_filled,
                       color: (gotData && !answerSavedForLater)
                           ? Theme.of(context).colorScheme.onSecondaryContainer
                           : Colors.grey,
@@ -407,7 +425,7 @@ class _ScanPageState extends State<ScanPage> {
                                     .colorScheme
                                     .secondaryContainer))
                         : const ButtonStyle(),
-                    label: Text("Save to Ask Later!",
+                    label: Text("Save to Ask Later",
                         style: TextStyle(
                             color: (gotData && !answerSavedForLater)
                                 ? Theme.of(context)
@@ -443,7 +461,7 @@ class ImageDeleteOverlay extends StatelessWidget {
           child: const Icon(
             Icons.delete_forever_outlined,
             color: Colors.red,
-            semanticLabel: "Close Image",
+            semanticLabel: "Remove Image",
             size: 72,
           ),
         ));
@@ -462,25 +480,25 @@ class CameraButtonRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-          onPressed: openGallary,
-          icon: const Icon(
-            Icons.photo,
-            size: 48,
-          ),
-          color: Colors.white,
-        ),
-        IconButton(
           onPressed: openCamera,
           icon: const Icon(
-            Icons.camera_alt,
-            size: 48,
+            FluentIcons.camera_add_24_filled,
+            size: 64,
           ),
           color: Colors.white,
         ),
+        // IconButton(
+        //   onPressed: openGallary,
+        //   icon: const Icon(
+        //     Icons.photo,
+        //     size: 48,
+        //   ),
+        //   color: Colors.white,
+        // ),
       ],
     );
   }

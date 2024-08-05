@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:developer' as dev;
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -111,7 +112,7 @@ class _AnswerPageState extends State<AnswerPage> {
         // Invalid Api Key Provided!
         apiCalled = true;
         responseText =
-            "Invalid API Key supplied! Please verify your API key in settings, or turn off Custom API Key!";
+            "The API key provided is invalid. Please check your API key in preferences or disable the custom API key option.";
       }
     } else {
       _model = GenerativeModel(
@@ -178,7 +179,7 @@ class _AnswerPageState extends State<AnswerPage> {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               behavior: SnackBarBehavior.floating,
-              content: const Text("Auto Saved to Library!!"),
+              content: const Text("Automatically saved to the library."),
               action: SnackBarAction(
                   label: "Delete",
                   onPressed: () async {
@@ -190,7 +191,7 @@ class _AnswerPageState extends State<AnswerPage> {
             ));
           }
         } else {
-          responseText = "Error fetching Answer";
+          responseText = "Unable to fetch the answer.";
         }
       });
 
@@ -306,11 +307,11 @@ class _AnswerPageState extends State<AnswerPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    const Icon(Icons.subject_rounded),
+                    const Icon(FluentIcons.book_letter_24_filled),
                     Text(
                         ' ${subject.name.replaceFirst("Photo", '').toTitleCase()}'),
                     const Spacer(),
-                    const Icon(Icons.class_rounded),
+                    const Icon(FluentIcons.video_person_star_24_filled),
                     Text(' $grade'),
                   ],
                 ),
@@ -337,11 +338,11 @@ class _AnswerPageState extends State<AnswerPage> {
                                 animatedTexts: [
                                   [
                                     TypewriterAnimatedText(
-                                        "Generating the Answer...",
+                                        "Generating Answer...",
                                         cursor: '|',
                                         speed:
                                             const Duration(milliseconds: 100)),
-                                    WavyAnimatedText("Generating the Answer...",
+                                    WavyAnimatedText("Generating Answer...",
                                         speed:
                                             const Duration(milliseconds: 100))
                                   ][textAnimationIndex]
@@ -369,16 +370,16 @@ class _AnswerPageState extends State<AnswerPage> {
         duration: const Duration(milliseconds: 100),
         child: FloatingActionButton.extended(
           enableFeedback: true,
-          tooltip: "Save the Answer for later reference",
+          tooltip: "Save this answer for future reference",
           onPressed: () async {
             // save the image to the disk
             if (answerSaved) {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 behavior: SnackBarBehavior.floating,
-                content: const Text("Already Saved!!"),
+                content: const Text("Already Saved"),
                 action: SnackBarAction(
-                    label: "Delete",
+                    label: "Remove",
                     onPressed: () async {
                       await HiveManager.deleteAnswer(answerKey);
                       setState(() {
@@ -392,7 +393,7 @@ class _AnswerPageState extends State<AnswerPage> {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               behavior: SnackBarBehavior.floating,
-              content: const Text("Saved to Library!!"),
+              content: const Text("Saved to Library."),
               action: SnackBarAction(
                   label: "Delete",
                   onPressed: () async {
