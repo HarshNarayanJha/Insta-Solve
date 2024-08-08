@@ -176,6 +176,14 @@ class _SettingSheetState extends State<SettingSheet> {
               },
               child: const Text("Save Settings"),
             ),
+            const Divider(),
+            ListTile(
+              title: Text(
+                "Disclaimer: AI responses may not always be completely accurate. Please verify critical details with primary sources or academic references.",
+                style: Theme.of(context).textTheme.labelMedium,
+                textAlign: TextAlign.center,
+              ),
+            ),
             // const Spacer(),
             const Divider(),
             AboutListTile(
@@ -192,30 +200,24 @@ class _SettingSheetState extends State<SettingSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      GestureDetector(
-                        onTap: () {
+                      IconButton(
+                        icon: const Row(children: [
+                          Icon(Icons.open_in_new_rounded),
+                          Text(" Website")
+                        ]),
+                        onPressed: () {
                           _launchURL("https://harshnj.is-a.dev/instasolve");
                         },
-                        child: IconButton(
-                          icon: const Row(children: [
-                            Icon(Icons.open_in_new_rounded),
-                            Text("Website")
-                          ]),
-                          onPressed: () {},
-                        ),
                       ),
-                      GestureDetector(
-                        onTap: () {
+                      IconButton(
+                        icon: const Row(children: [
+                          Icon(Icons.open_in_new_rounded),
+                          Text(" GitHub")
+                        ]),
+                        onPressed: () {
                           _launchURL(
                               "https://github.com/HarshNarayanJha/Insta-Solve");
                         },
-                        child: IconButton(
-                          icon: const Row(children: [
-                            Icon(Icons.open_in_new_rounded),
-                            Text("GitHub")
-                          ]),
-                          onPressed: () {},
-                        ),
                       ),
                     ])
               ],
@@ -254,6 +256,7 @@ class _SettingSheetState extends State<SettingSheet> {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         behavior: SnackBarBehavior.floating,
+        duration: Duration(milliseconds: 1200),
         content: Text("Preferences Saved!")));
   }
 }
