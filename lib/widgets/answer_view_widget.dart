@@ -27,7 +27,8 @@ class AnswerViewWidget extends StatelessWidget {
             IconButton.filledTonal(
               constraints: const BoxConstraints(maxWidth: 100),
               onPressed: () {
-                Clipboard.setData(ClipboardData(text: responseText.toPlainText()));
+                Clipboard.setData(
+                    ClipboardData(text: responseText.toPlainText()));
               },
               icon: const Row(
                 children: [
@@ -57,6 +58,13 @@ class AnswerViewWidget extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 20),
+        Text(
+          "Disclaimer: AI responses may not always be completely accurate. Please verify critical details with primary sources or academic references.",
+          style: Theme.of(context).textTheme.labelMedium,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 20),
         TeXView(
           renderingEngine: renderingEngine,
           child: TeXViewMarkdown(responseText),
