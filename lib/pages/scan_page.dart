@@ -281,7 +281,7 @@ class _ScanPageState extends State<ScanPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 25),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: SizedBox(

@@ -194,16 +194,28 @@ class _SettingSheetState extends State<SettingSheet> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          _launchURL("https://instasolve.netlify.app");
+                          _launchURL("https://harshnj.is-a.dev/instasolve");
                         },
-                        child: const Text("Website"),
+                        child: IconButton(
+                          icon: const Row(children: [
+                            Icon(Icons.open_in_new_rounded),
+                            Text("Website")
+                          ]),
+                          onPressed: () {},
+                        ),
                       ),
                       GestureDetector(
                         onTap: () {
                           _launchURL(
                               "https://github.com/HarshNarayanJha/Insta-Solve");
                         },
-                        child: const Text("GitHub"),
+                        child: IconButton(
+                          icon: const Row(children: [
+                            Icon(Icons.open_in_new_rounded),
+                            Text("GitHub")
+                          ]),
+                          onPressed: () {},
+                        ),
                       ),
                     ])
               ],
