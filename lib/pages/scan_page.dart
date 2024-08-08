@@ -80,7 +80,7 @@ class _ScanPageState extends State<ScanPage> {
           AndroidUiSettings(
             toolbarTitle: "Cropping Question Image",
             statusBarColor: Colors.black,
-            toolbarColor: Theme.of(context).colorScheme.primaryContainer,
+            toolbarColor: Theme.of(context).colorScheme.inversePrimary,
             activeControlsWidgetColor: Theme.of(context).colorScheme.primary,
             lockAspectRatio: false,
             aspectRatioPresets: [
@@ -276,7 +276,6 @@ class _ScanPageState extends State<ScanPage> {
                           FluentIcons.image_add_24_filled,
                           size: 36,
                         ),
-                        color: Colors.white,
                       ),
                     ],
                   ),
@@ -297,7 +296,9 @@ class _ScanPageState extends State<ScanPage> {
                       maxLength: 60,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.all(16),
-                        label: Text((_image == null) ? "Ask your question" : "Image context"),
+                        label: Text((_image == null)
+                            ? "Ask your question"
+                            : "Image context"),
                         suffixIcon: AnimatedOpacity(
                           duration: Durations.short3,
                           opacity: customInput.text.isEmpty ? 0.0 : 1.0,
