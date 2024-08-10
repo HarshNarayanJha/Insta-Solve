@@ -29,8 +29,8 @@ class InstasolveAppBar extends StatelessWidget implements PreferredSizeWidget {
                 isScrollControlled: true,
                 sheetAnimationStyle: AnimationStyle(
                     duration: Durations.medium1,
-                    curve: Curves.easeInSine,
-                    reverseCurve: Curves.easeOutSine,
+                    curve: Curves.easeIn,
+                    reverseCurve: Curves.easeOut,
                     reverseDuration: Durations.short4),
                 showDragHandle: true,
                 enableDrag: true,
