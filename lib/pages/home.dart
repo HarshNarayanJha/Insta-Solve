@@ -143,6 +143,14 @@ class _HomePageState extends State<HomePage> {
                                   );
                                 },
                               ),
+                              IconButton.filled(
+                                icon: const Icon(Icons.camera_alt_rounded),
+                                tooltip: "New Scan",
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, ScanPage.routeName);
+                                },
+                              ),
                               const SizedBox(width: 10),
                             ],
                           ),
