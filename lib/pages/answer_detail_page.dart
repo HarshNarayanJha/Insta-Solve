@@ -24,7 +24,7 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
     final Answer ans = arguments[HomePage.answerKey];
-    final int index = arguments[HomePage.indexKey];
+    final int key = arguments[HomePage.keyKey];
 
     return Scaffold(
       appBar: const InstasolveAppBar(),
@@ -38,7 +38,7 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
             const SizedBox(height: 25),
             (ans.imagePath != null)
                 ? Hero(
-                    tag: 'image-$index',
+                    tag: 'image-$key',
                     child: ImageFrame(file: XFile(ans.imagePath!)))
                 : Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -52,7 +52,7 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Hero(
-                      tag: 'prompt-$index',
+                      tag: 'prompt-$key',
                       child: Text(ans.prompt,
                           style: Theme.of(context).textTheme.headlineMedium),
                     ),

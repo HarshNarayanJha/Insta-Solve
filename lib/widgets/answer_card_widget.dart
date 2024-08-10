@@ -26,15 +26,15 @@ class AnswerCardWidget extends StatelessWidget {
   static const String subjectKey = 'subject';
   static const String gradeKey = 'grade';
 
-  void openAnswer(BuildContext context, Answer ans, int index) {
+  void openAnswer(BuildContext context, Answer ans) {
     Navigator.pushNamed(context, AnswerDetailPage.routeName, arguments: {
       HomePage.answerKey: ans,
-      HomePage.indexKey: index,
+      HomePage.keyKey: ans.key,
     });
   }
 
-  Future<void> deleteAnswer(int index) async {
-    await HiveManager.deleteAnswerAt(index);
+  Future<void> deleteAnswer(dynamic key) async {
+    await HiveManager.deleteAnswer(key);
     await onDelete();
   }
 
@@ -42,11 +42,11 @@ class AnswerCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        openAnswer(context, ans, index);
+        openAnswer(context, ans);
       },
       child: Card.filled(
         margin: const EdgeInsets.only(left: 0, right: 0, bottom: 8, top: 8),
-        color: Theme.of(context).colorScheme.tertiaryContainer,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: Column(
           children: [
             (ans.imagePath != null)
@@ -70,7 +70,7 @@ class AnswerCardWidget extends StatelessWidget {
                               .labelSmall
                               ?.copyWith(color: Colors.grey))
                       : Hero(
-                          tag: 'prompt-$index',
+                          tag: 'prompt-${ans.key}',
                           child: Text(
                             ans.prompt,
                             style: Theme.of(context)
@@ -133,13 +133,13 @@ class AnswerCardWidget extends StatelessWidget {
           PopupMenuItem(
             child: const Text("Open"),
             onTap: () {
-              openAnswer(context, ans, index);
+              openAnswer(context, ans);
             },
           ),
           PopupMenuItem(
             child: const Text("Delete"),
             onTap: () async {
-              await deleteAnswer(index);
+              await deleteAnswer(ans.key);
             },
           ),
           PopupMenuItem(
@@ -172,7 +172,7 @@ class AnswerCardWidget extends StatelessWidget {
           },
           blendMode: BlendMode.darken,
           child: Hero(
-            tag: 'image-$index',
+            tag: 'image-${ans.key}',
             child: Image.file(
               File(ans.imagePath!),
               fit: BoxFit.fitWidth,

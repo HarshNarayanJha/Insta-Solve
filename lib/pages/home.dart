@@ -18,7 +18,7 @@ class HomePage extends StatefulWidget {
   static const routeName = '/home';
 
   static const answerKey = 'answer';
-  static const indexKey = 'index';
+  static const keyKey = 'anskey';
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -171,19 +171,13 @@ class _HomePageState extends State<HomePage> {
                                     ),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(35)),
-                              label: const Text("Search Your Questions"),
+                              label: const Text("Search Answers"),
                               isDense: true,
                             ),
                           ),
                           const SizedBox(height: 10),
                         ],
                       ),
-                      // child: AnswerFilterWidget(
-                      //   filterSubject: filterSubject,
-                      //   filterClass: filterClass,
-                      //   onFilterClass: onFilterClass,
-                      //   onFilterSubject: onFilterSubject,
-                      // ),
                     ),
                     Flexible(
                       flex: 1,
