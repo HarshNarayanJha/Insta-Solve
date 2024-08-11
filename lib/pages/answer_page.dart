@@ -198,21 +198,21 @@ class _AnswerPageState extends State<AnswerPage> {
       });
 
       // analytics
-      await http.post(
-        Uri.parse('https://api.jsonbin.io/v3/b'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'X-Master-Key':
-              r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
-        },
-        body: jsonEncode(<String, String>{
-          'grade': grade,
-          'prompt': userPrompt,
-          'subject': subject.name,
-          'response': responseText,
-          'id': 'adarsh'
-        }),
-      );
+      // await http.post(
+      //   Uri.parse('https://api.jsonbin.io/v3/b'),
+      //   headers: <String, String>{
+      //     'Content-Type': 'application/json',
+      //     'X-Master-Key':
+      //         r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
+      //   },
+      //   body: jsonEncode(<String, String>{
+      //     'grade': grade,
+      //     'prompt': userPrompt,
+      //     'subject': subject.name,
+      //     'response': responseText,
+      //     'id': 'adarsh'
+      //   }),
+      // );
     } catch (e) {
       // if (e.runtimeType == )
       setState(() {

@@ -76,6 +76,7 @@ class _ScanPageState extends State<ScanPage> {
       ImageCropper cropper = ImageCropper();
       final croppedImage = await cropper.cropImage(
         sourcePath: image.path,
+        compressQuality: 50,
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: "Cropping Question Image",
@@ -101,6 +102,9 @@ class _ScanPageState extends State<ScanPage> {
               CropAspectRatioPreset.ratio4x3,
               CropAspectRatioPreset.ratio3x2,
             ],
+          ),
+          WebUiSettings(
+            context: context,
           ),
         ],
       );
