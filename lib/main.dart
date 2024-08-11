@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Instasolve',
+      title: 'Insta Solve',
       theme: Provider.of<ThemeProvider>(context).userTheme == Brightness.light
           ? theme.light()
           : theme.dark(),

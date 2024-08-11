@@ -13,7 +13,7 @@
         </intent>
     </queries>
     <application
-        android:label="Instasolve"
+        android:label="Insta Solve"
         android:name="${applicationName}"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_rules"
