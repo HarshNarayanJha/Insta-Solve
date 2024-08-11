@@ -50,6 +50,10 @@ class _ScanPageState extends State<ScanPage> {
   void _loadPreferences() async {
     final savedSettings = await preferencesService.getSettings();
 
+    if (askedAgainSetDone) {
+      return;
+    }
+
     setState(() {
       gradeValue = UtilData.grades[savedSettings.defaultGrade];
     });
@@ -213,14 +217,6 @@ class _ScanPageState extends State<ScanPage> {
                   style: Theme.of(context).textTheme.labelMedium,
                   textAlign: TextAlign.center,
                 ),
-                // Text(
-                //   "NOTE: if the app closes after taking a photo, reopen this screen to get the photo back",
-                //   style: Theme.of(context)
-                //       .textTheme
-                //       .labelMedium
-                //       ?.copyWith(color: Colors.grey.shade600),
-                //   textAlign: TextAlign.center,
-                // ),
                 const SizedBox(height: 30),
                 Stack(
                   children: [
@@ -300,11 +296,11 @@ class _ScanPageState extends State<ScanPage> {
                               customInput.text.isNotEmpty || (_image != null);
                         });
                       },
-                      maxLength: 60,
+                      maxLength: 200,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.all(16),
                         label: Text((_image == null)
-                            ? "Ask your question"
+                            ? "Ask your Question"
                             : "Image context"),
                         suffixIcon: AnimatedOpacity(
                           duration: Durations.short3,
@@ -335,7 +331,7 @@ class _ScanPageState extends State<ScanPage> {
                   leadingIcon: const Icon(FluentIcons.book_letter_24_filled),
                   initialSelection: subject.name,
                   helperText:
-                      "Choose a subject to refine the question\nFor broader results, you may select 'Generic'",
+                      "Choose a subject to refine the question\nFor broader results, you may select 'No preference'",
                   onSelected: (String? value) {
                     setState(() {
                       subject =
@@ -359,7 +355,7 @@ class _ScanPageState extends State<ScanPage> {
                       const Icon(FluentIcons.video_person_star_24_filled),
                   initialSelection: gradeValue,
                   helperText:
-                      "Specify the grade level to tailor the results.\nChoose 'No Specific Grade' for automatic determination.",
+                      "Specify the grade level to tailor the results.\nChoose 'No preference' for automatic determination.",
                   onSelected: (String? value) {
                     setState(() {
                       gradeValue = value!;
@@ -367,7 +363,7 @@ class _ScanPageState extends State<ScanPage> {
                   },
                   dropdownMenuEntries: UtilData.grades
                       .map<DropdownMenuEntry<String>>((String val) {
-                    return DropdownMenuEntry<String>(value: val, label: val);
+                    return DropdownMenuEntry<String>(value: val, label: val.toTitleCase());
                   }).toList(),
                 ),
                 const SizedBox(height: 50),
