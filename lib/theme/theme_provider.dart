@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ThemeProvider with ChangeNotifier {
   Brightness userTheme = Brightness.dark;
 
-  void setTheme(theme) {
+  void setTheme(Brightness theme) {
     userTheme = theme;
     notifyListeners();
   }
