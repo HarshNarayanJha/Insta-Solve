@@ -20,7 +20,7 @@ class EmptyHomeWidget extends StatelessWidget {
         ),
         const SizedBox(height: 50),
         Text(
-          "Start scanning to save your answers",
+          "No Saved Answers. Tap the button below to ask a question",
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           textAlign: TextAlign.center,
         ),

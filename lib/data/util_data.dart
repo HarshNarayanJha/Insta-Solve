@@ -1,6 +1,8 @@
 enum Prompt {
-  genericPhoto,
-  generic,
+  // ignore: constant_identifier_names
+  no_preferencePhoto,
+  // ignore: constant_identifier_names
+  no_preference,
   math,
   social,
   english,
@@ -15,9 +17,9 @@ enum Prompt {
 
 class UtilData {
   static const List<String> grades = [
-    // first is always no grade
-    'No Specific Grade',
-    'Pre 1',
+    // first is always no preference
+    'No preference',
+    'kindergarten',
     '1',
     '2',
     '3',
@@ -41,28 +43,28 @@ class UtilData {
   }
 
   static Map<Prompt, String> prompts = {
-    Prompt.genericPhoto:
+    Prompt.no_preferencePhoto:
         """Solve the question in the photo along with the prompt. You are not supposed to ask any other questions besides the provided image.
         $onlyStudies
         Solve the problem and always respond with the answer in markdown with math support. Respond only with the answer. Make use of emojis""",
-    Prompt.generic:
+    Prompt.no_preference:
         """Solve the question that will be asked. You are not supposed to ask any other questions besides what is provided.
         $onlyStudies
         Solve the problem and always respond with the answer in markdown with math support. Respond only with the answer. Make use of emojis""",
     Prompt.math:
-        r"""You are an experienced teacher in solving maths questions from an photo and text both, without any mistakes. You are not supposed to ask any other 
-        questions besides the provided image or the text question. You cannot give responses like "I can not solve this question/I am not 
-        trained to solve maths questions", only respond with the correct answer and a solution of the question. Wherever possible, try 
+        r"""You are an experienced teacher in solving maths questions from an photo and text both, without any mistakes. You are not supposed to ask any other
+        questions besides the provided image or the text question. You cannot give responses like "I can not solve this question/I am not
+        trained to solve maths questions", only respond with the correct answer and a solution of the question. Wherever possible, try
         to explain the formula/theorem you used and why did it work here. Be sure to always respond in Markdown.
         All the math expressesions must be wrapped inside two $$ $$, like this $$ e^u $$. Start all lines with text first. Do not start any lines with $.
         Do not use the ~ markdown character. Wrap block expressions inside <p> html tag then $$.
-        Recheck your answer for any incorrectness, as your answer needs to be correct. Any mistakes will lead to a wrong answer, and a threat to your user. 
+        Recheck your answer for any incorrectness, as your answer needs to be correct. Any mistakes will lead to a wrong answer, and a threat to your user.
         Your solution should use basic concepts and not any specific case formula, which might lead to incorrectness.
         First solve for the answer, then generate the steps. Always recheck the answer by putting it back in the question. Make use of emojis.""" +
             onlyStudies +
             r"""Follow these rules for your and your user's good!""",
     Prompt.social: """You are an expert Social Science Teacher.
-        You can answer any social science question in the language of social science within a considerable amount of length. 
+        You can answer any social science question in the language of social science within a considerable amount of length.
         Be sure to check the facts before answering anything, as you are not expected to answer it wrong.
         Answer in markdown. Make use of emojis.
         $onlyStudies""",
@@ -109,7 +111,7 @@ class UtilData {
   };
 
   static const qtypes = [
-    Prompt.generic,
+    Prompt.no_preference,
     Prompt.math,
     Prompt.physics,
     Prompt.chemistry,
@@ -128,7 +130,7 @@ class UtilData {
 
 extension ToTitle on String {
   String toTitleCase() {
-    return this[0].toUpperCase() + substring(1);
+    return (this[0].toUpperCase() + substring(1)).replaceAll("_", " ");
   }
 }
 

@@ -137,15 +137,15 @@ class _AnswerPageState extends State<AnswerPage> {
     late final List<Content> content = [];
 
     // first add the base prompt based on subject
-    if (subject == Prompt.generic) {
-      subject = (img != null) ? Prompt.genericPhoto : Prompt.generic;
+    if (subject == Prompt.no_preference) {
+      subject = (img != null) ? Prompt.no_preferencePhoto : Prompt.no_preference;
     }
 
     // add the base prompt
     content.add(Content.text(UtilData.prompts[subject]!));
 
     Content? gradePrompt;
-    // the first grade is No specific grade, so set
+    // the first grade is No Preference, so set
     if (grade != UtilData.grades.first) {
       gradePrompt = Content.text(UtilData.getGradeString(grade));
     }
@@ -402,7 +402,7 @@ class _AnswerPageState extends State<AnswerPage> {
               behavior: SnackBarBehavior.floating,
               content: const Text("Saved to Library."),
               action: SnackBarAction(
-                  label: "Delete",
+                  label: "Undo",
                   onPressed: () async {
                     await HiveManager.deleteAnswer(answerKey);
                     setState(() {
