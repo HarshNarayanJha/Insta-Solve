@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -113,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                               Text(
                                 "Saved Answers",
                                 style:
-                                    Theme.of(context).textTheme.headlineLarge,
+                                    Theme.of(context).textTheme.headlineMedium,
                               ),
                               const Spacer(),
                               IconButton(
@@ -144,8 +145,8 @@ class _HomePageState extends State<HomePage> {
                                 },
                               ),
                               IconButton.filled(
-                                icon: const Icon(Icons.camera_alt_rounded),
-                                tooltip: "New Scan",
+                                icon: const Icon(FluentIcons.notebook_add_24_filled),
+                                tooltip: "Ask a New Question",
                                 onPressed: () {
                                   Navigator.pushNamed(
                                       context, ScanPage.routeName);
@@ -246,8 +247,8 @@ class _HomePageState extends State<HomePage> {
         offset: fabVisible ? Offset.zero : Offset.fromDirection(3.14 / 2, 1.5),
         child: FloatingActionButton.extended(
             tooltip: "Capture New Question",
-            label: const Text("New Scan"),
-            icon: const Icon(Icons.camera_alt_rounded),
+            label: const Text("Ask Question", style: TextStyle(fontSize: 16)),
+            icon: const Icon(FluentIcons.notebook_add_24_filled, size: 28),
             onPressed: () {
               Navigator.pushNamed(context, ScanPage.routeName);
             }),

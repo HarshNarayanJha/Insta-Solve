@@ -265,19 +265,22 @@ class _ScanPageState extends State<ScanPage> {
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 36.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        onPressed: _openGallery,
-                        icon: const Icon(
-                          FluentIcons.image_add_24_filled,
-                          size: 36,
+                Visibility(
+                  visible: _image == null,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 42.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          onPressed: _openGallery,
+                          icon: const Icon(
+                            FluentIcons.image_add_24_filled,
+                            size: 42,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 25),

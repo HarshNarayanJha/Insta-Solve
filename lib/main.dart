@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:insta_solve/data/preferences_service.dart';
+import 'package:insta_solve/models/settings.dart';
 import 'package:insta_solve/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -21,16 +23,23 @@ void main() async {
   // open a box
   await Hive.openBox<Answer>(UtilData.boxName);
 
+  final prefs = PreferencesService();
+  Settings savedPrefs = await prefs.getSettings();
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
-      child: const MyApp(),
+      child: MyApp(savedPrefs.darkMode),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp(this.darkMode, {super.key});
+
+  final bool darkMode;
+
+  static bool themeLoaded = false;
 
   // This widget is the root of your application.
   @override
@@ -39,10 +48,18 @@ class MyApp extends StatelessWidget {
     TextTheme textTheme = createTextTheme(context, "Roboto", "Baloo 2");
     MaterialTheme theme = MaterialTheme(textTheme);
 
+    if (!themeLoaded) {
+      Provider.of<ThemeProvider>(context, listen: false)
+          .setTheme(darkMode ? Brightness.dark : Brightness.light);
+      themeLoaded = true;
+    }
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Instasolve',
-      theme: Provider.of<ThemeProvider>(context).userTheme == Brightness.light ? theme.light() : theme.dark(),
+      theme: Provider.of<ThemeProvider>(context).userTheme == Brightness.light
+          ? theme.light()
+          : theme.dark(),
       home: const HomePage(),
       routes: {
         HomePage.routeName: (context) => const HomePage(),

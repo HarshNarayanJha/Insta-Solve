@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 
 class EmptyHomeWidget extends StatelessWidget {
@@ -13,8 +14,8 @@ class EmptyHomeWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       children: [
         Icon(
-          Icons.image_search,
-          color: Theme.of(context).colorScheme.onPrimaryContainer,
+          FluentIcons.notebook_lightning_24_filled,
+          color: Theme.of(context).colorScheme.onTertiaryContainer,
           size: 164,
         ),
         const SizedBox(height: 50),
@@ -26,7 +27,7 @@ class EmptyHomeWidget extends StatelessWidget {
         const SizedBox(height: 10),
         Text(
           "Your saved answers will appear here",
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.grey.shade600),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.grey.shade600),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 80),

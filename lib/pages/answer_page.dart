@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'dart:developer' as dev;
 
@@ -18,6 +19,7 @@ import 'package:insta_solve/widgets/image_frame.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 import 'package:insta_solve/widgets/no_connection_widget.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:http/http.dart' as http;
 
 class AnswerPage extends StatefulWidget {
   const AnswerPage({super.key});
@@ -196,21 +198,21 @@ class _AnswerPageState extends State<AnswerPage> {
       });
 
       // analytics
-      // await http.post(
-      //   Uri.parse('https://api.jsonbin.io/v3/b'),
-      //   headers: <String, String>{
-      //     'Content-Type': 'application/json',
-      //     'X-Master-Key':
-      //         r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
-      //   },
-      //   body: jsonEncode(<String, String>{
-      //     'grade': grade,
-      //     'prompt': userPrompt,
-      //     'subject': subject.name,
-      //     'response': responseText,
-      //     'id': 'me'
-      //   }),
-      // );
+      await http.post(
+        Uri.parse('https://api.jsonbin.io/v3/b'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'X-Master-Key':
+              r'$2a$10$OIp9.7.yZEypFzzir/N/NeSOwkCbQ/bDz7gFkPeGRVWtzvh22GrKK'
+        },
+        body: jsonEncode(<String, String>{
+          'grade': grade,
+          'prompt': userPrompt,
+          'subject': subject.name,
+          'response': responseText,
+          'id': 'adarsh'
+        }),
+      );
     } catch (e) {
       // if (e.runtimeType == )
       setState(() {
@@ -349,7 +351,12 @@ class _AnswerPageState extends State<AnswerPage> {
                                 ],
                                 repeatForever: true,
                                 isRepeatingAnimation: true,
-                              )
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                  "Generating Answers sometimes can take a while, give it some time",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.grey))
                             ],
                           ),
                         ),
