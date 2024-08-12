@@ -17,6 +17,15 @@ After you have the project open in your favourite IDE,
  1. Create a `.env` file in the project root
  2. Add a key `API_KEY=<Your API Key Here>`
  3. Run `dart run build_runner build` to create the `env` file containing the API_KEY.
+ 4. Create a `key.properties` file in `android/` and add the following contents
+ ```properties
+ storePassword=<password>
+ keyPassword=<password>
+ keyAlias=<alias>
+ storeFile=<keystore_file_path>
+ ```
+
+ OR you can follow the instructions here [Sign The App](https://docs.flutter.dev/deployment/android#sign-the-app)
 
 Now you can build the apk using
 
