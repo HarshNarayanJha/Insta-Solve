@@ -1,7 +1,7 @@
 ![img](assets/play-store/play_store_feature_graphic.png)
 
 # Insta Solve
- Instantly Sove all your academic doubts
+ Doubts are Fun
 
 # Getting the App
 
@@ -17,7 +17,7 @@ After you have the project open in your favourite IDE,
  1. Create a `.env` file in the project root
  2. Add a key `API_KEY=<Your API Key Here>`
  3. Run `dart run build_runner build` to create the `env` file containing the API_KEY.
- 
+
 Now you can build the apk using
 
  4. `flutter build apk`
