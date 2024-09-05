@@ -3,6 +3,10 @@
 # Insta Solve
  Doubts are Fun
 
+https://www.youtube.com/watch?v=IYkIOJWMwHc
+
+Vote the submission here: https://ai.google.dev/competition/projects/insta-solve
+
 # Getting the App
 
 Releases are not available as of now. But you can still build the app yourself!
