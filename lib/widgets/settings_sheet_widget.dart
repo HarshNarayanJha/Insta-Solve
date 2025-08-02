@@ -201,7 +201,7 @@ class _SettingSheetState extends State<SettingSheet> {
             // const Spacer(),
             const Divider(),
             AboutListTile(
-              applicationVersion: "v1.0.0+4",
+              applicationVersion: "v1.1.1+5",
               applicationName: "Insta Solve",
               icon: const Icon(Icons.info_rounded),
               applicationLegalese: "©️ 2024 Harsh Narayan Jha",

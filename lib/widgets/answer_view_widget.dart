@@ -29,7 +29,8 @@ class AnswerViewWidget extends StatelessWidget {
             IconButton.filledTonal(
               constraints: const BoxConstraints(maxWidth: 100),
               onPressed: () {
-                Clipboard.setData(ClipboardData(text: responseText));
+                Clipboard.setData(
+                    ClipboardData(text: responseText.toPlainText()));
               },
               icon: const Row(
                 children: [
