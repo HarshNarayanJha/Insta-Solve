@@ -1,6 +1,5 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tex/flutter_tex.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:insta_solve/data/util_data.dart';
 import 'package:insta_solve/models/answer.dart';
@@ -80,7 +79,8 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
             ),
             const SizedBox(height: 10),
             AnswerViewWidget(
-                renderingEngine: const TeXViewRenderingEngine.mathjax(),
+                question: ans.prompt,
+                imgPath: ans.imagePath,
                 responseText: ans.response,
                 textAnimationIndex: 1),
             const SizedBox(height: 40),

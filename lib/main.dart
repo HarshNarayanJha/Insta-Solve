@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tex/flutter_tex.dart';
 import 'package:insta_solve/data/preferences_service.dart';
 import 'package:insta_solve/models/settings.dart';
 import 'package:insta_solve/theme/theme_provider.dart';
@@ -25,6 +26,8 @@ void main() async {
 
   final prefs = PreferencesService();
   Settings savedPrefs = await prefs.getSettings();
+
+  await TeXRenderingServer.start();
 
   runApp(
     ChangeNotifierProvider(

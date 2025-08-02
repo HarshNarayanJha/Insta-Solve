@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 import 'dart:developer' as dev;
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tex/flutter_tex.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:insta_solve/data/hive_manager.dart';
@@ -32,9 +30,6 @@ class AnswerPage extends StatefulWidget {
 
 class _AnswerPageState extends State<AnswerPage> {
   final preferencesService = PreferencesService();
-
-  final TeXViewRenderingEngine renderingEngine =
-      const TeXViewRenderingEngine.mathjax();
 
   late final ScrollController pageScrollController;
   bool fabVisible = false;
@@ -168,6 +163,9 @@ class _AnswerPageState extends State<AnswerPage> {
     try {
       dev.log(
           "Calling Google ****************************************************");
+      // for (var c in content) {
+      //   dev.log(c.toJson().toString());
+      // }
       final response = await _model.generateContent(content);
 
       setState(() {
@@ -276,7 +274,7 @@ class _AnswerPageState extends State<AnswerPage> {
           padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 15),
               (file != null)
@@ -360,7 +358,8 @@ class _AnswerPageState extends State<AnswerPage> {
                         ),
                       )
                     : AnswerViewWidget(
-                        renderingEngine: renderingEngine,
+                        question: promptText,
+                        imgPath: file?.path,
                         responseText: responseText,
                         textAnimationIndex: textAnimationIndex)
               else
