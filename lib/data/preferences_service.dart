@@ -10,6 +10,7 @@ class PreferencesService {
   static const darkModeKey = 'darkmode';
   static const customKeyKey = 'customApiKey';
   static const userKeyKey = 'userApiKey';
+  static const useProModelKey = 'useProModel';
 
   Future saveSettings(Settings setting) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -19,6 +20,7 @@ class PreferencesService {
     await prefs.setBool(autosaveKey, setting.autosave);
     await prefs.setBool(darkModeKey, setting.darkMode);
     await prefs.setBool(customKeyKey, setting.customApiKey);
+    await prefs.setBool(useProModelKey, setting.useProModel);
 
     await storage.write(key: userKeyKey, value: setting.userApiKey);
 
@@ -33,6 +35,7 @@ class PreferencesService {
     final autosave = prefs.getBool(autosaveKey) ?? false;
     final darkMode = prefs.getBool(darkModeKey) ?? true;
     final customApiKey = prefs.getBool(customKeyKey) ?? false;
+    final useProModel = prefs.getBool(useProModelKey) ?? false;
 
     String? userApiKey = await storage.read(key: userKeyKey);
 
@@ -41,6 +44,7 @@ class PreferencesService {
         autosave: autosave,
         darkMode: darkMode,
         customApiKey: customApiKey,
+        useProModel: useProModel,
         userApiKey: userApiKey);
   }
 }

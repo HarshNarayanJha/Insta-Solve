@@ -4,6 +4,7 @@ class Settings {
   final bool darkMode;
 
   final bool customApiKey;
+  final bool useProModel;
   final String? userApiKey;
 
   Settings(
@@ -11,5 +12,6 @@ class Settings {
       required this.autosave,
       required this.darkMode,
       required this.customApiKey,
-      required this.userApiKey});
+      required this.userApiKey,
+      required this.useProModel});
 }

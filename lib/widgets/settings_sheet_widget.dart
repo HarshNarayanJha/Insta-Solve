@@ -22,6 +22,7 @@ class _SettingSheetState extends State<SettingSheet> {
   bool darkMode = true;
 
   bool customApiKey = false;
+  bool useProModel = false;
   TextEditingController userApiKeyController = TextEditingController();
 
   @override
@@ -40,6 +41,7 @@ class _SettingSheetState extends State<SettingSheet> {
       autosave = savedSettings.autosave;
       darkMode = savedSettings.darkMode;
       customApiKey = savedSettings.customApiKey;
+      useProModel = savedSettings.useProModel;
       userApiKeyController.text = savedSettings.userApiKey ?? "";
     });
   }
@@ -170,6 +172,17 @@ class _SettingSheetState extends State<SettingSheet> {
                 ],
               ),
             ),
+            SwitchListTile(
+              thumbIcon: const WidgetStatePropertyAll(Icon(Icons.smart_toy)),
+              title: const Text("Use Gemini Pro Model"),
+              value: useProModel,
+              onChanged: (newValue) => setState(
+                () {
+                  useProModel = newValue;
+                  _saveSettings();
+                },
+              ),
+            ),
             TextButton(
               onPressed: () {
                 _saveSettings();
@@ -250,6 +263,7 @@ class _SettingSheetState extends State<SettingSheet> {
             UtilData.grades.indexOf(defaultGrade ?? UtilData.grades.first),
         darkMode: darkMode,
         customApiKey: customApiKey,
+        useProModel: useProModel,
         userApiKey: userApiKeyController.text);
 
     preferencesService.saveSettings(newSettings);

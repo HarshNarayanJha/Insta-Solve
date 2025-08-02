@@ -96,10 +96,13 @@ class _AnswerPageState extends State<AnswerPage> {
 
     final apiKeyRegex = RegExp(r'^AIza[0-9A-Za-z\\-_]{35}$');
 
+    final MODEL =
+        savedSettings.useProModel ? "gemini-2.5-pro" : 'gemini-2.5-flash';
+
     if (customApiKey) {
       if (apiKeyRegex.hasMatch(userApiKey)) {
         _model = GenerativeModel(
-            model: 'gemini-2.5-flash',
+            model: MODEL,
             apiKey: userApiKey,
             generationConfig: generationConfig);
       } else {
@@ -110,9 +113,7 @@ class _AnswerPageState extends State<AnswerPage> {
       }
     } else {
       _model = GenerativeModel(
-          model: 'gemini-2.5-flash',
-          apiKey: Env.apiKey,
-          generationConfig: generationConfig);
+          model: MODEL, apiKey: Env.apiKey, generationConfig: generationConfig);
     }
 
     setState(() {
