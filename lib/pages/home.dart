@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                                   showModalBottomSheet(
                                     context: context,
                                     barrierColor: Colors.black45,
-                                    sheetAnimationStyle: AnimationStyle(
+                                    sheetAnimationStyle: const AnimationStyle(
                                         duration: Durations.medium1,
                                         curve: Curves.easeIn,
                                         reverseCurve: Curves.easeOut,
@@ -145,7 +145,8 @@ class _HomePageState extends State<HomePage> {
                                 },
                               ),
                               IconButton.filled(
-                                icon: const Icon(FluentIcons.notebook_add_24_filled),
+                                icon: const Icon(
+                                    FluentIcons.notebook_add_24_filled),
                                 tooltip: "Ask a New Question",
                                 onPressed: () {
                                   Navigator.pushNamed(

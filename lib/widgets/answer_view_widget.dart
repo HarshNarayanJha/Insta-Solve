@@ -43,7 +43,12 @@ class AnswerViewWidget extends StatelessWidget {
             IconButton.filledTonal(
               constraints: const BoxConstraints(maxWidth: 100),
               onPressed: () async {
-                Share.share(responseText.toPlainText());
+                final path = imgPath;
+                SharePlus.instance.share(ShareParams(
+                    text: responseText.toPlainText(),
+                    title: "Solution from InstaSolve",
+                    subject: question,
+                    files: path != null ? [XFile(path)] : null));
               },
               icon: const Row(
                 children: [

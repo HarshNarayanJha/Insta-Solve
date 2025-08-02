@@ -84,9 +84,11 @@ class _ScanPageState extends State<ScanPage> {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: "Cropping Question Image",
-            statusBarColor: Colors.black,
-            toolbarColor: Theme.of(context).colorScheme.inversePrimary,
-            activeControlsWidgetColor: Theme.of(context).colorScheme.primary,
+            statusBarColor: Theme.of(context).colorScheme.tertiaryContainer,
+            toolbarColor: Theme.of(context).colorScheme.tertiaryContainer,
+            toolbarWidgetColor:
+                Theme.of(context).colorScheme.onTertiaryContainer,
+            activeControlsWidgetColor: Colors.green,
             lockAspectRatio: false,
             aspectRatioPresets: [
               CropAspectRatioPreset.square,
@@ -327,7 +329,7 @@ class _ScanPageState extends State<ScanPage> {
                 DropdownMenu<String>(
                   width: 350,
                   label: const Text("Subject"),
-                  menuHeight: 300,
+                  menuHeight: 350,
                   leadingIcon: const Icon(FluentIcons.book_letter_24_filled),
                   initialSelection: subject.name,
                   helperText:
@@ -350,7 +352,7 @@ class _ScanPageState extends State<ScanPage> {
                 DropdownMenu<String>(
                   width: 350,
                   label: const Text("Grade level"),
-                  menuHeight: 300,
+                  menuHeight: 350,
                   leadingIcon:
                       const Icon(FluentIcons.video_person_star_24_filled),
                   initialSelection: gradeValue,
@@ -363,7 +365,8 @@ class _ScanPageState extends State<ScanPage> {
                   },
                   dropdownMenuEntries: UtilData.grades
                       .map<DropdownMenuEntry<String>>((String val) {
-                    return DropdownMenuEntry<String>(value: val, label: val.toTitleCase());
+                    return DropdownMenuEntry<String>(
+                        value: val, label: val.toTitleCase());
                   }).toList(),
                 ),
                 const SizedBox(height: 50),
@@ -459,7 +462,7 @@ class ImageDeleteOverlay extends StatelessWidget {
     return Container(
         height: 300,
         width: 300,
-        decoration: BoxDecoration(color: Colors.black.withOpacity(0.6)),
+        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.6)),
         child: GestureDetector(
           onTap: removeImage,
           child: const Icon(

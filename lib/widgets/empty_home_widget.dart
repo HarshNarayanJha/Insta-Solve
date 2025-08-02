@@ -21,13 +21,19 @@ class EmptyHomeWidget extends StatelessWidget {
         const SizedBox(height: 50),
         Text(
           "No Saved Answers. Tap the button below to ask a question",
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(fontWeight: FontWeight.w700),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 10),
         Text(
           "Your saved answers will appear here",
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.grey.shade600),
+          style: Theme.of(context)
+              .textTheme
+              .labelLarge
+              ?.copyWith(color: Colors.grey.shade600),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 80),

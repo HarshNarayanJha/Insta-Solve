@@ -80,7 +80,7 @@ class HiveManager {
       log("Answer with key $key not found!");
       return;
     }
-    
+
     if (ans.imagePath != null) {
       await File(ans.imagePath!).delete();
       log("Delete image at ${ans.imagePath!}");

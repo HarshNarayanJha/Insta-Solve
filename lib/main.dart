@@ -44,22 +44,30 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // final brightness = View.of(context).platformDispatcher.platformBrightness;
-    TextTheme textTheme = createTextTheme(context, "Roboto", "Baloo 2");
-    MaterialTheme theme = MaterialTheme(textTheme);
-
-    if (!themeLoaded) {
+    if (context.mounted && !themeLoaded) {
       Provider.of<ThemeProvider>(context, listen: false)
           .setTheme(darkMode ? Brightness.dark : Brightness.light);
       themeLoaded = true;
     }
 
+    final themeSettings = context.watch<ThemeProvider>();
+    var themeMode = ThemeMode.system;
+
+    if (themeSettings.userTheme == Brightness.dark) {
+      themeMode = ThemeMode.dark;
+    } else {
+      themeMode = ThemeMode.light;
+    }
+
+    TextTheme textTheme = createTextTheme(context, "Roboto", "Baloo 2");
+    MaterialTheme theme = MaterialTheme(textTheme);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Insta Solve',
-      theme: Provider.of<ThemeProvider>(context).userTheme == Brightness.light
-          ? theme.light()
-          : theme.dark(),
+      themeMode: themeMode,
+      theme: theme.light(),
+      darkTheme: theme.dark(),
       home: const HomePage(),
       routes: {
         HomePage.routeName: (context) => const HomePage(),

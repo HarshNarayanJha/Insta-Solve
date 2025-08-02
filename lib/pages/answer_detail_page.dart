@@ -33,7 +33,7 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
         physics: const ClampingScrollPhysics(),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 25),
             (ans.imagePath != null)
@@ -70,7 +70,8 @@ class _AnswerDetailPageState extends State<AnswerDetailPage> {
               child: Row(
                 children: [
                   const Icon(FluentIcons.book_letter_24_filled),
-                  Text(' ${ans.subject.replaceFirst("Photo", '').toTitleCase()}'),
+                  Text(
+                      ' ${ans.subject.replaceFirst("Photo", '').toTitleCase()}'),
                   const Spacer(),
                   const Icon(FluentIcons.video_person_star_24_filled),
                   Text(' ${ans.grade}'),

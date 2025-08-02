@@ -125,7 +125,6 @@ class UtilData {
   ];
 
   static const String boxName = 'questionAnswers';
-  // static const String answersKey = 'answers';
 }
 
 extension ToTitle on String {
@@ -136,7 +135,7 @@ extension ToTitle on String {
 
 extension ToPlainText on String {
   String toPlainText() {
-      RegExp regex = RegExp(r'[*\$_~`#]');
-      return replaceAll(regex, '');
+    RegExp regex = RegExp(r'[*\$_~`#]');
+    return replaceAll(regex, '');
   }
 }

@@ -19,7 +19,7 @@ import 'package:insta_solve/widgets/image_frame.dart';
 import 'package:insta_solve/widgets/instasolve_app_bar.dart';
 import 'package:insta_solve/widgets/no_connection_widget.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 
 class AnswerPage extends StatefulWidget {
   const AnswerPage({super.key});
@@ -97,9 +97,6 @@ class _AnswerPageState extends State<AnswerPage> {
 
     GenerationConfig generationConfig = GenerationConfig(
       temperature: 0.2,
-      topK: 1,
-      topP: 1,
-      // maxOutputTokens: 1024,
     );
 
     final apiKeyRegex = RegExp(r'^AIza[0-9A-Za-z\\-_]{35}$');
@@ -107,7 +104,7 @@ class _AnswerPageState extends State<AnswerPage> {
     if (customApiKey) {
       if (apiKeyRegex.hasMatch(userApiKey)) {
         _model = GenerativeModel(
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             apiKey: userApiKey,
             generationConfig: generationConfig);
       } else {
@@ -118,7 +115,7 @@ class _AnswerPageState extends State<AnswerPage> {
       }
     } else {
       _model = GenerativeModel(
-          model: 'gemini-1.5-flash',
+          model: 'gemini-2.5-flash',
           apiKey: Env.apiKey,
           generationConfig: generationConfig);
     }
@@ -138,7 +135,8 @@ class _AnswerPageState extends State<AnswerPage> {
 
     // first add the base prompt based on subject
     if (subject == Prompt.no_preference) {
-      subject = (img != null) ? Prompt.no_preferencePhoto : Prompt.no_preference;
+      subject =
+          (img != null) ? Prompt.no_preferencePhoto : Prompt.no_preference;
     }
 
     // add the base prompt

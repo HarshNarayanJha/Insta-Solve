@@ -20,7 +20,8 @@ class AnswerFilterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.outline, width: 0.2),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.outline, width: 0.2),
         borderRadius: BorderRadius.circular(10),
         color: Theme.of(context).colorScheme.surfaceContainer,
       ),
@@ -42,29 +43,29 @@ class AnswerFilterWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               DropdownButton<String>(
-                  menuMaxHeight: 250,
-                  alignment: Alignment.centerRight,
-                  underline: const SizedBox(),
-                  value: filterSubject,
-                  icon: Container(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: const Icon(FluentIcons.book_letter_24_filled),
-                  ),
-                  onChanged: (String? value) {
-                    // log(value!);
-                    onFilterSubject(value!);
-                  },
-                  items: [
-                    const DropdownMenuItem(value: 'all', child: Text('All')),
-                    ...UtilData.qtypes
-                        .map<DropdownMenuItem<String>>((Prompt val) {
-                      return DropdownMenuItem<String>(
-                        value: val.name,
-                        child: Text(val.name.toTitleCase()),
-                      );
-                    })
-                  ],
+                menuMaxHeight: 250,
+                alignment: Alignment.centerRight,
+                underline: const SizedBox(),
+                value: filterSubject,
+                icon: Container(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: const Icon(FluentIcons.book_letter_24_filled),
                 ),
+                onChanged: (String? value) {
+                  // log(value!);
+                  onFilterSubject(value!);
+                },
+                items: [
+                  const DropdownMenuItem(value: 'all', child: Text('All')),
+                  ...UtilData.qtypes
+                      .map<DropdownMenuItem<String>>((Prompt val) {
+                    return DropdownMenuItem<String>(
+                      value: val.name,
+                      child: Text(val.name.toTitleCase()),
+                    );
+                  })
+                ],
+              ),
               DropdownButton<String>(
                 menuMaxHeight: 250,
                 value: filterClass,

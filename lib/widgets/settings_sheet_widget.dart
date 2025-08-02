@@ -123,7 +123,8 @@ class _SettingSheetState extends State<SettingSheet> {
               value: darkMode,
               onChanged: (newValue) => setState(() {
                 darkMode = newValue;
-                Provider.of<ThemeProvider>(context, listen: false)
+                context
+                    .read<ThemeProvider>()
                     .setTheme(newValue ? Brightness.dark : Brightness.light);
                 _saveSettings();
               }),
@@ -151,7 +152,7 @@ class _SettingSheetState extends State<SettingSheet> {
                       enabled: customApiKey,
                       maxLength: 39,
                       controller: userApiKeyController,
-                      scribbleEnabled: false,
+                      stylusHandwritingEnabled: false,
                       onChanged: (apiKey) {
                         // setState(() => userApiKeyController.text = apiKey);
                       },

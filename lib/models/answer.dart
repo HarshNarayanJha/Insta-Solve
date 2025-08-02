@@ -19,5 +19,10 @@ class Answer extends HiveObject {
   @HiveField(4)
   String response = "";
 
-  Answer({this.imagePath, required this.prompt, required this.subject, required this.grade, required this.response});
+  Answer(
+      {this.imagePath,
+      required this.prompt,
+      required this.subject,
+      required this.grade,
+      required this.response});
 }

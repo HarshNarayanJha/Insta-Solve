@@ -41,8 +41,8 @@ class _FilterSheetState extends State<FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-
-    bool filterApplied = filterClass != 'all' || filterSubject != 'all' || sortOldFirst;
+    bool filterApplied =
+        filterClass != 'all' || filterSubject != 'all' || sortOldFirst;
 
     return Container(
       constraints: const BoxConstraints(minHeight: 300),
@@ -65,8 +65,7 @@ class _FilterSheetState extends State<FilterSheet> {
           ),
           ListTile(
             leading: const Text("Filter Subject"),
-            leadingAndTrailingTextStyle:
-                Theme.of(context).textTheme.bodyLarge,
+            leadingAndTrailingTextStyle: Theme.of(context).textTheme.bodyLarge,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -101,8 +100,7 @@ class _FilterSheetState extends State<FilterSheet> {
           ),
           ListTile(
             leading: const Text("Filter Grade"),
-            leadingAndTrailingTextStyle:
-                Theme.of(context).textTheme.bodyLarge,
+            leadingAndTrailingTextStyle: Theme.of(context).textTheme.bodyLarge,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -138,19 +136,19 @@ class _FilterSheetState extends State<FilterSheet> {
           ListTile(
             leading: Text(
                 "Sort ${sortOldFirst ? '(Oldest First)' : '(Newest First)'}"),
-            leadingAndTrailingTextStyle:
-                Theme.of(context).textTheme.bodyLarge,
+            leadingAndTrailingTextStyle: Theme.of(context).textTheme.bodyLarge,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Icon(sortOldFirst ? Icons.arrow_downward_rounded: Icons.arrow_upward_rounded),
+                Icon(sortOldFirst
+                    ? Icons.arrow_downward_rounded
+                    : Icons.arrow_upward_rounded),
                 IconButton(
                   onPressed: () {
                     widget.onSortOldFirst(!sortOldFirst);
                     setState(() {
                       sortOldFirst = !sortOldFirst;
                     });
-
                   },
                   icon: const Icon(Icons.swap_vert_rounded),
                 ),
